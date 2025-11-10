@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <title>2bit</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: url("https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=2000&q=80") no-repeat center center / cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      position: relative;
+      width: 600px;
+      height: 600px;
+    }
+
+    .img {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      object-fit: contain;
+      transition: transform 0.3s, top 0.6s ease, left 0.6s ease;
+      cursor: pointer;
+    }
+
+    .img:hover {
+      transform: scale(1.1);
+    }
+
+    /* 各圖片位置 */
+    #img2 { top: 0px; left: 400px; }
+    #img1 { top: 0px; left: -350px; }
+    #img3 { top: 0px; left: 400px; }
+    #img4 { top: 0px; left: -350px; }
+    #img5 { top: 0px; left: -50px; }
+    #img1, #img3 { z-index: 2; }
+    #img2, #img4 { z-index: 3; }
+    #img5 { z-index: 1; }
+    /* 滑鼠移到圖5時換圖6 */
+    #img5:hover {
+      content: url("C:/Users/tsait/codeFile/js/lines.png");
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img id="img1" class="img" src="C:/Users/tsait/codeFile/js/Kurover.png" alt="Kurover">
+    <img id="img2" class="img" src="C:/Users/tsait/codeFile/js/fishA.png" alt="fishA">
+    <img id="img3" class="img" src="C:/Users/tsait/codeFile/js/Bob.png" alt="Bob">
+    <img id="img4" class="img" src="C:/Users/tsait/codeFile/js/fishB.png" alt="fishB">
+    <img id="img5" class="img" src="C:/Users/tsait/codeFile/js/linen.png" alt="line">
+  </div>
+
+  <script>
+    const img1 = document.getElementById('img1');
+    const img2 = document.getElementById('img2');
+    const img3 = document.getElementById('img3');
+    const img4 = document.getElementById('img4');
+    const img5 = document.getElementById('img5');
+
+
+    img5.addEventListener('click', () => {
+        // 取得目前位置
+        const img2Style = getComputedStyle(img2);
+        const img4Style = getComputedStyle(img4);
+
+        // 交換 top / left
+        const tempTop = img4Style.top;
+        const tempLeft = img4Style.left;
+
+        img4.style.top = img2Style.top;
+        img4.style.left = img2Style.left;
+
+        img2.style.top = tempTop;
+        img2.style.left = tempLeft;
+
+        check();
+      
+    });
+    function check()
+    {
+        // === 加上判斷是否重疊 ===
+      const rect1 = img1.getBoundingClientRect();
+      const rect2 = img2.getBoundingClientRect();
+      const rect3 = img3.getBoundingClientRect();
+      const rect4 = img4.getBoundingClientRect();
+
+      function isOverlapping(a, b) {
+        return !(
+          a.right < b.left ||
+          a.left > b.right ||
+          a.bottom < b.top ||
+          a.top > b.bottom
+        );
+      }
+
+      const overlapA = isOverlapping(rect1, rect2);
+      const overlapB = isOverlapping(rect3, rect4);
+
+      if (overlapA && overlapB)
+        alert("success!");
+    }
+    check();
+  </script>
+</body>
+</html>
