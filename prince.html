@@ -1,113 +1,462 @@
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8">
-  <title>2bit</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>貓貓星球</title>
+<style>
+    body{margin:0;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#d6cc98;font-family:sans-serif;overflow:hidden;}
     body {
-      margin: 0;
-      height: 100vh;
-      background: url("https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=2000&q=80") no-repeat center center / cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+        margin: 0;
+        overflow: hidden;
+        background-image: url("https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=2000&q=80");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
     }
+    #gameWrapper{display:flex;flex-direction:column;align-items:center;width:100%;max-width:500px;}
+    #container{position:relative;width:420px;height:420px;overflow:visible;margin:0 auto;}
+    .planet{position:absolute;width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:visible;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+    .planet img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+    svg{position:absolute;top:0;left:0;width:100%;height:100%;}
+    line{stroke:#555;stroke-width:5;cursor:pointer;transition:stroke .3s;}
+    line:hover{stroke:#000;}
+    .person{width:90px;height:90px;object-fit:contain;pointer-events:none;transition:transform .8s ease;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+    #info{display:flex;flex-direction:column;align-items:center;margin-top:15px;width:100%;}
+    #steps{font-size:1.5rem;font-weight:bold;color:#333;}
+    #timer{font-size:1.2rem;color:#444;margin-top:5px;}
+    #buttons{display:flex;justify-content:center;gap:10px;margin-top:15px;width:100%;}
+    #resetBtn{padding:8px 16px;background:#7a654f;color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;}
+    #resetBtn:hover{background:#5c4d3a;}
+    #prevBtn,#nextBtn{width:50px;height:50px;border-radius:50%;border:none;background:#f1f1f1b1;color:#7a654f;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .3s;}
+    #prevBtn:hover,#nextBtn:hover{background:#5c4d3a;color:#fff;}
+    #prevBtn::before,#nextBtn::before{content:"";display:block;width:0;height:0;border:12px solid transparent;position:absolute;}
+    #prevBtn::before{border-right-color:#7a654f;margin-left:-5px;}
+    #nextBtn::before{border-left-color:#7a654f;margin-left:5px;}
+    #prevBtn:hover::before{border-right-color:#fff;}
+    #nextBtn:hover::before{border-left-color:#fff;}
+    @media(max-width:768px){#container{width:380px;height:380px;}.planet{width:120px;height:120px;}.person{width:80px;height:80px;}}
+    .slide-out-left{animation:slideOutLeft .6s forwards;}
+    .slide-in-right{animation:slideInRight .6s forwards;}
+    .slide-out-right{animation:slideOutRight .6s forwards;}
+    .slide-in-left{animation:slideInLeft .6s forwards;}
+    @keyframes slideOutLeft{from{transform:translateX(0);opacity:1}to{transform:translateX(-100%);opacity:0}}
+    @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    @keyframes slideOutRight{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+    @keyframes slideInLeft{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    .popup{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .3s ease;}
+    .popup-content{background:#fff;border-radius:20px;padding:30px 40px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,.3);animation:popUp .4s ease;max-width:90%;}
+    .popup-content h2{margin:8px 0 10px;}
+    .popup-content button{background:#ffb60b;color:#fff;border:none;border-radius:12px;padding:10px 20px;cursor:pointer;font-size:16px;transition:background .2s;}
+    .popup-content button:hover{background:#ff750b;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes popUp{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+    .left-panel{position:absolute;left:10px;top:50px;width:220px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:14px;color:#1e293b;z-index:100;}
+    .left-panel h3{margin:0 0 10px;font-size:15px;color:#1e293b;}
+    .gate-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+    .gate-btn{flex:1 1 45%;padding:6px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);text-align:center;}
+    .gate-btn:hover{background:#f8fafc;box-shadow:0 3px 8px rgba(0,0,0,.1);}
+    .gate-list{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0;max-height:80px;overflow-y:auto;}
+    .gate-badge{display:flex;align-items:center;gap:5px;padding:3px 7px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;font-family:ui-monospace,monospace;font-size:11px;box-shadow:0 1px 2px rgba(0,0,0,.06);}
+    .gate-badge .remove{width:15px;height:15px;background:#ef4444;color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .gate-badge .remove:hover{background:#dc2626;}
+    .reset-circuit-btn{width:100%;margin-top:8px;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;cursor:pointer;}
+    .reset-circuit-btn:hover{background:#f8fafc;}
 
-    .container {
-      position: relative;
-      width: 600px;
-      height: 600px;
-    }
 
-    .img {
-      position: absolute;
-      width: 600px;
-      height: 600px;
-      object-fit: contain;
-      transition: transform 0.3s, top 0.6s ease, left 0.6s ease;
-      cursor: pointer;
-    }
-
-    .img:hover {
-      transform: scale(1.1);
-    }
-
-    /* 各圖片位置 */
-    #img2 { top: 0px; left: 400px; }
-    #img1 { top: 0px; left: -350px; }
-    #img3 { top: 0px; left: 400px; }
-    #img4 { top: 0px; left: -350px; }
-    #img5 { top: 0px; left: -50px; }
-    #img1, #img3 { z-index: 2; }
-    #img2, #img4 { z-index: 3; }
-    #img5 { z-index: 1; }
-    /* 滑鼠移到圖5時換圖6 */
-    #img5:hover {
-  content: url("https://raw.githubusercontent.com/s112321005/little_prince/main/lines.png");
+/* 左箭頭正三角形 */
+#nextBtn::before {
+    width: 3px;
+    height: 3px;
+    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+    background: #7a654f;
+    margin-right:-3px;
 }
+
+
+/* 右箭頭正三角形 */
+#prevBtn::before {
+    width: 3px;
+    height: 3px;
+    clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+    background: #7a654f;
+    margin-right:3px;
+}
+
+
+/* hover 顏色 */
+#prevBtn:hover::before { background: #fff; }
+#nextBtn:hover::before { background: #fff; }
+
+
 </style>
 </head>
 <body>
-  <div class="container">
-    <img id="img1" class="img" src="https://raw.githubusercontent.com/s112321005/little_prince/main/Kurover.png" alt="Kurover">
-    <img id="img2" class="img" src="https://raw.githubusercontent.com/s112321005/little_prince/main/fishA.png" alt="fishA">
-    <img id="img3" class="img" src="https://raw.githubusercontent.com/s112321005/little_prince/main/Bob.png" alt="Bob">
-    <img id="img4" class="img" src="https://raw.githubusercontent.com/s112321005/little_prince/main/fishB.png" alt="fishB">
-    <img id="img5" class="img" src="https://raw.githubusercontent.com/s112321005/little_prince/main/linen.png" alt="line">
+<div id="gameWrapper">
+  <h2 style="margin:10px 0 5px;">貓貓星球</h2>
+  <div id="container"><svg></svg></div>
+  <div id="info">
+    <div id="levelNumber">題目：1</div>
+    <div id="steps">步數：0</div>
+    <div id="timer">時間：0 秒</div>
+  </div>
+  <div id="buttons">
+    <button id="prevBtn"></button>
+    <button id="resetBtn">重新開始</button>
+    <button id="nextBtn"></button>
+  </div>
+</div>
+
+<!-- 左側 Gate 面板 -->
+<div class="left-panel">
+  <h3>選擇 BIT 數</h3>
+  <select id="bitSelector">
+    <option value="1">1 BIT</option>
+    <option value="2" selected>2 BIT</option>
+  </select>
+
+  <h3 style="margin-top:10px;">新增量子閘門</h3>
+  <div class="gate-btns">
+    <button class="gate-btn" onclick="applyGateAndAnimate({type:'X', target:0})">X q0</button>
+    <button class="gate-btn" onclick="applyGateAndAnimate({type:'X', target:1})">X q1</button>
+    <button class="gate-btn" onclick="applyGateAndAnimate({type:'CNOT', control:0, target:1})">1CNOT q0→q1</button>
+    <button class="gate-btn" onclick="applyGateAndAnimate({type:'CNOT', control:1, target:0})">1CNOT q1→q0</button>
+    <button class="gate-btn" onclick="applyGateAndAnimate({type:'0CNOT q0→q1'})">0CNOT q0→q1</button>
+    <button class="gate-btn" onclick="applyGateAndAnimate({type:'0CNOT q1→q0'})">0CNOT q1→q0</button>
   </div>
 
+  <h3 style="margin-top:10px;">目前電路</h3>
+  <div id="gateList" class="gate-list"></div>
+  <button class="reset-circuit-btn" onclick="resetCircuit()">重設電路</button>
+</div>
 
-  <script>
-    const img1 = document.getElementById('img1');
-    const img2 = document.getElementById('img2');
-    const img3 = document.getElementById('img3');
-    const img4 = document.getElementById('img4');
-    const img5 = document.getElementById('img5');
+<!-- 成功彈窗 -->
+<div id="successPopup" class="popup">
+  <div class="popup-content">
+    <h2>Congratulations 成功！</h2>
+    <p></p><br>
+    <button id="closePopup">再玩一次</button>
+  </div>
+</div>
 
+<script>
+  /* ---------- 圖片 ---------- */
+  const raw = "https://raw.githubusercontent.com/s112321005/little_prince/main/";
+  const planetImg = {
+    "3flower": raw+"3flower_00.png",
+    "Bob":     raw+"Bob_01.png",
+    "Kurover": raw+"Kurover_10.png",
+    "doll":    raw+"doll_11.png"
+  };
+  const fishImg = {
+    "3flowerFish": raw+"3flowerFish.png",
+    "BobFish":     raw+"BobFish.png",
+    "KuroFish":    raw+"KuroFish.png",
+    "dollFish":    raw+"dollFish%20.png"
+  };
 
-    img5.addEventListener('click', () => {
-        // 取得目前位置
-        const img2Style = getComputedStyle(img2);
-        const img4Style = getComputedStyle(img4);
+  /* ---------- 24 個排列（0=00,1=01,2=10,3=11）---------- */
+  const permList = [
+   "0132","0213","0231","0312","0321",
+    "1023","1032","1203","1230","1302","1320",
+    "2013","2031","2103","2130","2301","2310",
+    "3012","3021","3102","3120","3201","3210"
+  ].map(s => s.split("").map(Number));
 
-        // 交換 top / left
-        const tempTop = img4Style.top;
-        const tempLeft = img4Style.left;
+  /* ---------- 關卡資料（2-bit 共有 24 題，行星固定） ---------- */
+  let bitCount = 2;
+  const bitLevels = {
+    1: [{
+      planets: [
+        {id:"planet1", key:"3flower", top:140, left:20},
+        {id:"planet2", key:"Bob",     top:140, left:260}
+      ],
+      princes: [
+        {img: fishImg["3flowerFish"], target:"planet1"},
+        {img: fishImg["BobFish"],     target:"planet2"}
+      ],
+      lines:[["line12","planet1","planet2"]]
+    }],
+    2: Array.from({length: permList.length}, () => ({
+      planets: [
+        {id:"planet1", key:"3flower", top:0,   left:0},
+        {id:"planet2", key:"Bob",     top:0,   left:280},
+        {id:"planet3", key:"Kurover", top:280, left:0},
+        {id:"planet4", key:"doll",    top:280, left:280}
+      ],
+      princes: [
+        {img: fishImg["3flowerFish"], target:"planet1"}, // 00 的正確目標
+        {img: fishImg["BobFish"],     target:"planet2"}, // 01
+        {img: fishImg["KuroFish"],    target:"planet3"}, // 10
+        {img: fishImg["dollFish"],    target:"planet4"}  // 11
+      ],
+      lines: [
+        ["line12","planet1","planet2"],
+        ["line13","planet1","planet3"],
+        ["line24","planet2","planet4"],
+        ["line34","planet3","planet4"]
+      ]
+    }))
+  };
 
-        img4.style.top = img2Style.top;
-        img4.style.left = img2Style.left;
+  /* ---------- 2-bit：索引對應（固定不動的行星） ---------- */
+  // 0→planet1(00), 1→planet2(01), 2→planet3(10), 3→planet4(11)
+  const indexToPlanetId = ["planet1","planet2","planet3","planet4"];
 
-        img2.style.top = tempTop;
-        img2.style.left = tempLeft;
+  /* ---------- 狀態變數 ---------- */
+  let currentLevel = 0, steps = 0, startTime, timerInterval;
+  let circuit = [], currentMap = [0,1,2,3];
+  let planets = {}, princes = [];
+  const stepDisplay = document.getElementById("steps");
+  const timerDisplay = document.getElementById("timer");
+  const container = document.getElementById("container");
+  const svg = container.querySelector("svg");
 
-        check();
-      
-    });
-    function check()
-    {
-        // === 加上判斷是否重疊 ===
-      const rect1 = img1.getBoundingClientRect();
-      const rect2 = img2.getBoundingClientRect();
-      const rect3 = img3.getBoundingClientRect();
-      const rect4 = img4.getBoundingClientRect();
+  /* ---------- 位元工具 ---------- */
+  function stateIndexToBits(i){ return i.toString(2).padStart(bitCount,"0").split("").map(Number); }
+  function bitsToStateIndex(bits){ return parseInt(bits.join(""),2); }
 
-      function isOverlapping(a, b) {
-        return !(
-          a.right < b.left ||
-          a.left > b.right ||
-          a.bottom < b.top ||
-          a.top > b.bottom
-        );
-      }
-
-      const overlapA = isOverlapping(rect1, rect2);
-      const overlapB = isOverlapping(rect3, rect4);
-
-      if (overlapA && overlapB)
-        alert("success!");
+  /* ---------- Gate 應用（作用在狀態索引） ---------- */
+  function applyGateToIndex(stateIndex, gate){
+    const b = stateIndexToBits(stateIndex);
+    const nb = b.slice();
+    switch(gate.type){
+      case "X":
+        nb[gate.target] ^= 1; break;
+      case "CNOT":
+        if(nb[gate.control]) nb[gate.target] ^= 1; break;
+      case "0CNOT q0→q1":
+        if(nb[0] === 0) nb[1] ^= 1; break;
+      case "0CNOT q1→q0":
+        if(nb[1] === 0) nb[0] ^= 1; break;
     }
-    check();
-  </script>
+    return bitsToStateIndex(nb);
+  }
+
+  /* ---------- 左側 Gate 清單 ---------- */
+  function addGateToList(g){ circuit.push(g); renderGateList(); }
+  function resetCircuit(){ circuit = []; currentMap = [0,1,2,3]; renderGateList(); softResetFish(); }
+  function renderGateList(){
+    const box = document.getElementById("gateList"); box.innerHTML = "";
+    circuit.forEach((g,idx)=>{
+      const el = document.createElement("div"); el.className = "gate-badge";
+      el.innerHTML = `<span>${
+        g.type==="X" ? `X q${g.target}` :
+        g.type==="CNOT" ? `1CNOT q${g.control}→q${g.target}` : g.type
+      }</span>`;
+      const x = document.createElement("button"); x.className="remove"; x.textContent="x";
+      x.onclick = ()=>{ circuit.splice(idx,1); renderGateList(); };
+      el.appendChild(x); box.appendChild(el);
+    });
+  }
+
+  /* ---------- 點 Gate → 動畫搬魚（依 gate 產生的 2-bit permutation） ---------- */
+  function applyGateAndAnimate(gate){
+    addGateToList(gate);
+    currentMap = currentMap.map(x => applyGateToIndex(x, gate));
+
+    // 單一步對應（fromIdx -> toIdx）
+    const perm = [0,1,2,3].map(i => applyGateToIndex(i, gate));
+    perm.forEach((toIdx,fromIdx)=>{
+      const planetList = getCurrentLevel().planets;
+      if(fromIdx>=planetList.length || toIdx>=planetList.length) return;
+      const pidFrom = indexToPlanetId[fromIdx];
+      const pidTo   = indexToPlanetId[toIdx];
+      const fish = planets[pidFrom].querySelector(".person"); if(!fish) return;
+      const r1 = planets[pidFrom].getBoundingClientRect();
+      const r2 = planets[pidTo].getBoundingClientRect();
+      const dx = r2.left - r1.left, dy = r2.top - r1.top;
+      fish.style.transform = `translate(${dx}px,${dy}px) translate(-50%,-50%)`;
+      setTimeout(()=>{
+        planets[pidTo].appendChild(fish);
+        fish.style.transform="translate(-50%,-50%)";
+        checkSuccess();
+      },800);
+    });
+
+    steps++; stepDisplay.textContent = `步數：${steps}`;
+  }
+
+  function getCurrentLevel(){ return bitLevels[bitCount][currentLevel]; }
+
+  /* ---------- 載入關卡（貓固定、魚依 permList[level] 放置） ---------- */
+  function loadLevel(idx){
+    document.getElementById("levelNumber").textContent = `題目：${idx+1}`;
+    container.querySelectorAll(".planet").forEach(p=>p.remove());
+    svg.innerHTML=""; planets = {};
+
+    const level = getCurrentLevel();
+    // 1) 畫出四顆固定行星
+    level.planets.forEach(p=>{
+      const div = document.createElement("div");
+      div.className = "planet"; div.id = p.id;
+      div.style.top = p.top+"px"; div.style.left = p.left+"px";
+      const img = document.createElement("img"); img.src = planetImg[p.key];
+      div.appendChild(img);
+      container.appendChild(div);
+      planets[p.id] = div;
+    });
+
+    // 2) 邊線（可點互換動畫）
+    level.lines.forEach(([id,p1,p2])=>{
+      const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+      const pl1 = level.planets.find(x=>x.id===p1);
+      const pl2 = level.planets.find(x=>x.id===p2);
+      line.setAttribute("x1",pl1.left+70); line.setAttribute("y1",pl1.top+70);
+      line.setAttribute("x2",pl2.left+70); line.setAttribute("y2",pl2.top+70);
+      line.style.stroke="#555"; line.style.strokeWidth=4; line.style.cursor="pointer";
+      svg.appendChild(line);
+      line.addEventListener("mouseenter",()=>{line.style.stroke="#ffcc00"; line.style.strokeWidth=8;});
+      line.addEventListener("mouseleave",()=>{line.style.stroke="#555"; line.style.strokeWidth=4;});
+      line.addEventListener("click",()=>swap(p1,p2));
+    });
+
+    // 3) 目標（過關用）：固定不變（00 應到 planet1，01→planet2，…）
+    princes = JSON.parse(JSON.stringify(level.princes));
+
+    // 4) 魚依 permList[levelIdx] 初始擺放（貓不動）
+    placePrincesByFixedArrangement(idx);
+
+    // reset counters
+    steps = 0; stepDisplay.textContent = "步數：0";
+    startTimer();
+  }
+
+  /* ---------- 依 24 排列放魚（貓不動） ---------- */
+function placePrincesByFixedArrangement(levelIdx){
+  const keys = indexToPlanetId; // ["planet1","planet2","planet3","planet4"]
+  // 先清空舊魚
+  Object.values(planets).forEach(p =>
+    p.querySelectorAll(".person").forEach(img => img.remove())
+  );
+
+  if (bitCount === 1) {
+    // 1-bit：兩顆行星，直接互換（保持你原本行為）
+    princes.forEach((prince, i) => {
+      const img = document.createElement("img");
+      img.src = prince.img;
+      img.alt = "fish";
+      img.className = "person";
+      const planetId = i === 0 ? "planet2" : "planet1";
+      planets[planetId].appendChild(img);
+    });
+    return;
+  }
+
+  // 2-bit：用 permList 指定的排列（「位置 -> 魚」）
+  // perm[p] = 放在位置 p 的魚編號（0=00, 1=01, 2=10, 3=11）
+  const perm = permList[levelIdx]; // 0~23 對應你給的順序
+  const fishImgs = [
+    fishImg["3flowerFish"], // 0 (00)
+    fishImg["BobFish"],     // 1 (01)
+    fishImg["KuroFish"],    // 2 (10)
+    fishImg["dollFish"]     // 3 (11)
+  ];
+
+  for (let pos = 0; pos < 4; pos++) {
+    const fishIndex = perm[pos];          // 這個位置應該放哪一隻魚
+    const img = document.createElement("img");
+    img.src = fishImgs[fishIndex];
+    img.alt = "fish";
+    img.className = "person";
+    const planetId = keys[pos];          // 位置 0,1,2,3 = 左上/右上/左下/右下
+    planets[planetId].appendChild(img);
+  }
+}
+  /* ---------- 點線互換動畫（不改貓，只換兩行星上的魚） ---------- */
+  function swap(p1,p2){
+    const a = planets[p1].querySelector(".person");
+    const b = planets[p2].querySelector(".person");
+    if(!a||!b) return;
+    steps++; stepDisplay.textContent = `步數：${steps}`;
+    const r1 = planets[p1].getBoundingClientRect();
+    const r2 = planets[p2].getBoundingClientRect();
+    const dx = r2.left - r1.left, dy = r2.top - r1.top;
+    a.style.transform = `translate(${dx}px,${dy}px) translate(-50%,-50%)`;
+    b.style.transform = `translate(${-dx}px,${-dy}px) translate(-50%,-50%)`;
+    setTimeout(()=>{
+      planets[p1].appendChild(b);
+      planets[p2].appendChild(a);
+      a.style.transform = b.style.transform = "translate(-50%,-50%)";
+      checkSuccess();
+    },800);
+  }
+
+  /* ---------- 判定過關：每條魚是否回到對應目標行星 ---------- */
+  function checkSuccess(){
+    const ok = princes.every(prince=>{
+      const img = planets[prince.target].querySelector(".person");
+      return img && img.src === prince.img;
+    });
+    if(ok){
+      clearInterval(timerInterval);
+      showPopup(steps, Math.floor((Date.now()-startTime)/1000));
+    }
+  }
+
+  /* ---------- 計時器 / 重設 ---------- */
+  function startTimer(){
+    clearInterval(timerInterval);
+    startTime = Date.now();
+    timerInterval = setInterval(()=>{
+      timerDisplay.textContent = `時間：${Math.floor((Date.now()-startTime)/1000)} 秒`;
+    },1000);
+  }
+  function showPopup(steps,sec){
+    document.querySelector("#successPopup p").innerHTML =
+      `哇！你走了 ${steps} 步，花了 ${sec} 秒，讓每隻貓都吃到對應的魚耶~`;
+    document.getElementById("successPopup").style.display = "flex";
+  }
+  function softResetFish(){
+    steps = 0; stepDisplay.textContent = "步數：0";
+    placePrincesByFixedArrangement(currentLevel);
+    startTimer();
+  }
+
+  /* ---------- 事件繫結 ---------- */
+  document.getElementById("closePopup").onclick = ()=>{
+    document.getElementById("successPopup").style.display = "none";
+    softResetFish();
+  };
+  document.getElementById("resetBtn").onclick = ()=>{ resetCircuit(); };
+
+  document.getElementById("bitSelector").onchange = (e)=>{
+    bitCount = parseInt(e.target.value);
+    currentLevel = 0;
+    loadLevel(currentLevel);
+    resetCircuit();
+  };
+
+  let animating=false;
+  function transitionLevel(nextIdx,dir){
+    if(animating) return; animating = true;
+    container.classList.add(dir==="left"?"slide-out-left":"slide-out-right");
+    setTimeout(()=>{
+      currentLevel = nextIdx;
+      loadLevel(currentLevel);
+      container.classList.remove("slide-out-left","slide-out-right");
+      container.classList.add(dir==="left"?"slide-in-right":"slide-in-left");
+      setTimeout(()=>{
+        container.classList.remove("slide-in-right","slide-in-left");
+        animating = false;
+      },620);
+    },320);
+  }
+  document.getElementById("prevBtn").onclick = ()=>{
+    const L = bitLevels[bitCount].length;
+    transitionLevel((currentLevel-1+L)%L,"left");
+    resetCircuit();
+  };
+  document.getElementById("nextBtn").onclick = ()=>{
+    const L = bitLevels[bitCount].length;
+    transitionLevel((currentLevel+1)%L,"right");
+    resetCircuit();
+  };
+
+  /* ---------- 啟動 ---------- */
+  loadLevel(currentLevel);
+</script>
 </body>
 </html>
+
 
