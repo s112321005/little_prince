@@ -5,7 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>貓貓星球</title>
 <style>
-    body{margin:0;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#d6cc98;font-family:sans-serif;overflow:hidden;}
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 40px;
+        height: 100vh;
+        background: #d6cc98;
+        font-family: sans-serif;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
     body {
         margin: 0;
         overflow: hidden;
@@ -14,92 +27,509 @@
         background-position: center;
         background-repeat: no-repeat;
     }
-    #gameWrapper{display:flex;flex-direction:column;align-items:center;width:100%;max-width:500px;}
-    #container{position:relative;width:420px;height:420px;overflow:visible;margin:0 auto;}
-    .planet{position:absolute;width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:visible;border:3px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.2);}
-    .planet img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-    svg{position:absolute;top:0;left:0;width:100%;height:100%;}
-    line{stroke:#555;stroke-width:5;cursor:pointer;transition:stroke .3s;}
-    line:hover{stroke:#000;}
-    .person{width:90px;height:90px;object-fit:contain;pointer-events:none;transition:transform .8s ease;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
-    #info{display:flex;flex-direction:column;align-items:center;margin-top:15px;width:100%;}
-    #steps{font-size:1.5rem;font-weight:bold;color:#333;}
-    #timer{font-size:1.2rem;color:#444;margin-top:5px;}
-    #buttons{display:flex;justify-content:center;gap:10px;margin-top:15px;width:100%;}
-    #resetBtn{padding:8px 16px;background:#7a654f;color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;}
-    #resetBtn:hover{background:#5c4d3a;}
-    #prevBtn,#nextBtn{width:50px;height:50px;border-radius:50%;border:none;background:#f1f1f1b1;color:#7a654f;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .3s;}
-    #prevBtn:hover,#nextBtn:hover{background:#5c4d3a;color:#fff;}
-    #prevBtn::before,#nextBtn::before{content:"";display:block;width:0;height:0;border:12px solid transparent;position:absolute;}
-    #prevBtn::before{border-right-color:#7a654f;margin-left:-5px;}
-    #nextBtn::before{border-left-color:#7a654f;margin-left:5px;}
-    #prevBtn:hover::before{border-right-color:#fff;}
-    #nextBtn:hover::before{border-left-color:#fff;}
-    @media(max-width:768px){#container{width:380px;height:380px;}.planet{width:120px;height:120px;}.person{width:80px;height:80px;}}
-    .slide-out-left{animation:slideOutLeft .6s forwards;}
-    .slide-in-right{animation:slideInRight .6s forwards;}
-    .slide-out-right{animation:slideOutRight .6s forwards;}
-    .slide-in-left{animation:slideInLeft .6s forwards;}
-    @keyframes slideOutLeft{from{transform:translateX(0);opacity:1}to{transform:translateX(-100%);opacity:0}}
-    @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-    @keyframes slideOutRight{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
-    @keyframes slideInLeft{from{transform:translateX(-100%);opacity:0}to{transform:translateX(0);opacity:1}}
-    .popup{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .3s ease;}
-    .popup-content{background:#fff;border-radius:20px;padding:30px 40px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,.3);animation:popUp .4s ease;max-width:90%;}
-    .popup-content h2{margin:8px 0 10px;}
-    .popup-content button{background:#ffb60b;color:#fff;border:none;border-radius:12px;padding:10px 20px;cursor:pointer;font-size:16px;transition:background .2s;}
-    .popup-content button:hover{background:#ff750b;}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes popUp{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
-    .left-panel{position:absolute;left:10px;top:50px;width:220px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:14px;color:#1e293b;z-index:100;}
-    .left-panel h3{margin:0 0 10px;font-size:15px;color:#1e293b;}
-    .gate-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-    .gate-btn{flex:1 1 45%;padding:6px 8px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08);text-align:center;}
-    .gate-btn:hover{background:#f8fafc;box-shadow:0 3px 8px rgba(0,0,0,.1);}
-    .gate-list{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0;max-height:80px;overflow-y:auto;}
-    .gate-badge{display:flex;align-items:center;gap:5px;padding:3px 7px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;font-family:ui-monospace,monospace;font-size:11px;box-shadow:0 1px 2px rgba(0,0,0,.06);}
-    .gate-badge .remove{width:15px;height:15px;background:#ef4444;color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-    .gate-badge .remove:hover{background:#dc2626;}
-    .reset-circuit-btn{width:100%;margin-top:8px;padding:6px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;cursor:pointer;}
-    .reset-circuit-btn:hover{background:#f8fafc;}
+    #gameWrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 500px;
+    }
+    #container {
+        position: relative;
+        width: 420px;
+        height: 420px;
+        overflow: visible;
+        margin: 0 auto;
+    }
+    .planet {
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
+        border: 3px solid #fff;
+        box-shadow: 0 4px 10px rgba(0,0,0,.2);
+    }
+    .planet img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    line {
+        stroke: #555;
+        stroke-width: 5;
+        cursor: pointer;
+        transition: stroke .3s;
+    }
+    line:hover {
+        stroke: #000;
+    }
+    .person {
+        width: 90px;
+        height: 90px;
+        object-fit: contain;
+        pointer-events: none;
+        transition: transform .8s ease;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+   
+    /* 左側整合面板 */
+    .left-panel {
+        position: absolute;
+        left: 10px;
+        top: 50px;
+        width: 220px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        font-size: 14px;
+        color: #1e293b;
+        z-index: 100;
+        max-height: 85vh;
+        overflow-y: auto;
+        transition: all 0.4s ease;
+    }
+   
+    .left-panel h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: #1e293b;
+        text-align: center;
+    }
+   
+    #info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+   
+    #levelNumber {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
+   
+    #steps {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+    }
+   
+    #timer {
+        font-size: 1rem;
+        color: #444;
+    }
+   
+    #buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+        width: 100%;
+    }
+    #resetBtn {
+        padding: 8px 16px;
+        background: #7a654f;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+    #resetBtn:hover {
+        background: #5c4d3a;
+    }
+    #prevBtn, #nextBtn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: #f1f1f1b1;
+        color: #7a654f;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .3s;
+    }
+    #prevBtn:hover, #nextBtn:hover {
+        background: #5c4d3a;
+        color: #fff;
+    }
+    #prevBtn::before, #nextBtn::before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 0;
+        border: 12px solid transparent;
+        position: absolute;
+    }
+    #prevBtn::before {
+        border-right-color: #7a654f;
+        margin-left: -5px;
+    }
+    #nextBtn::before {
+        border-left-color: #7a654f;
+        margin-left: 5px;
+    }
+    #prevBtn:hover::before {
+        border-right-color: #fff;
+    }
+    #nextBtn:hover::before {
+        border-left-color: #fff;
+    }
+    @media (max-width: 768px) {
+        #container {
+            width: 380px;
+            height: 380px;
+        }
+        .planet {
+            width: 120px;
+            height: 120px;
+        }
+        .person {
+            width: 80px;
+            height: 80px;
+        }
+    }
+    .slide-out-left {
+        animation: slideOutLeft .6s forwards;
+    }
+    .slide-in-right {
+        animation: slideInRight .6s forwards;
+    }
+    .slide-out-right {
+        animation: slideOutRight .6s forwards;
+    }
+    .slide-in-left {
+        animation: slideInLeft .6s forwards;
+    }
+    @keyframes slideOutLeft {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(-100%); opacity: 0; }
+    }
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    @keyframes slideInLeft {
+        from { transform: translateX(-100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    .popup {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn .3s ease;
+    }
+    .popup-content {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px 40px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,.3);
+        animation: popUp .4s ease;
+        max-width: 90%;
+    }
+    .popup-content h2 {
+        margin: 8px 0 10px;
+    }
+    .popup-content button {
+        background: #ffb60b;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background .2s;
+    }
+    .popup-content button:hover {
+        background: #ff750b;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes popUp {
+        from { transform: scale(.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .gate-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+    }
+    .gate-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    .gate-btn {
+        flex: 1 1 45%;
+        padding: 6px 8px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+        text-align: center;
+    }
+    .gate-btn:hover {
+        background: #f8fafc;
+        box-shadow: 0 3px 8px rgba(0,0,0,.1);
+    }
+    .gate-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 8px 0;
+        max-height: 80px;
+        overflow-y: auto;
+    }
+    .gate-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 7px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    .gate-badge .remove {
+        width: 15px;
+        height: 15px;
+        background: #ef4444;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        font-size: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .gate-badge .remove:hover {
+        background: #dc2626;
+    }
+    .reset-circuit-btn {
+        width: 100%;
+        margin-top: 8px;
+        padding: 6px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .reset-circuit-btn:hover {
+        background: #f8fafc;
+    }
+    
+    /* 上一步按鈕 */
+    #undoBtn {
+        padding: 8px 16px;
+        background: #7a654f;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 100%;
+    }
+    #undoBtn:hover {
+        background: #5c4d3a;
+    }
+    #undoBtn:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    /* 底部電路圖面板 */
+    .circuit-panel {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        max-width: 3000px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        font-size: 14px;
+        color: #1e293b;
+        z-index: 100;
+        transition: all 0.4s ease;
+    }
+    .circuit-panel h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        color: #1e293b;
+        text-align: center;
+    }
+    .circuit-visualization {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .circuit-line {
+        display: flex;
+        align-items: center;
+        height: 25px;
+    }
+    .circuit-line-label {
+        width: 30px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    .circuit-line-path {
+        flex: 1;
+        height: 2px;
+        background: #111111;
+        position: relative;
+        margin: 0 10px;
+    }
+    .circuit-gate {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        background: #7a654f;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        font-weight: bold;
+    }
+    .circuit-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #111111;
+        border: 2px solid #000000;
+    }
+    .circuit-control.hollow {
+        background: white !important;
+        border: 2px solid #000000 !important;
+    }
+    .circuit-target {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        color: #111111;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .circuit-target::after {
+        content: "⊕";
+    }
+    .circuit-connector {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 100%;
+        background: #111111;
+    }
 
-
-/* 左箭頭正三角形 */
-#nextBtn::before {
-    width: 3px;
-    height: 3px;
-    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
-    background: #7a654f;
-    margin-right:-3px;
-}
-
-
-/* 右箭頭正三角形 */
-#prevBtn::before {
-    width: 3px;
-    height: 3px;
-    clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
-    background: #7a654f;
-    margin-right:3px;
-}
-
-
-/* hover 顏色 */
-#prevBtn:hover::before { background: #fff; }
-#nextBtn:hover::before { background: #fff; }
-
-
+    /* ==================== 新增：隱藏電路模式 ==================== */
+    .hide-circuit-mode .left-panel,
+    .hide-circuit-mode .circuit-panel {
+        transform: translateX(-120%) !important;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .hide-circuit-mode .circuit-panel {
+        transform: translateY(120%) !important;
+    }
+    .toggle-circuit-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: rgba(122, 101, 79, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 10000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .toggle-circuit-btn:hover {
+        background: #5c4d3a;
+        transform: scale(1.1);
+    }
+    .toggle-circuit-btn::before {
+        content: "⚡";
+    }
+    .hide-circuit-mode .toggle-circuit-btn::before {
+        content: "👁️";
+    }
 </style>
 </head>
 <body>
 <div id="gameWrapper">
   <h2 style="margin:10px 0 5px;">貓貓星球</h2>
   <div id="container"><svg></svg></div>
-  <div id="info">
-    <div id="levelNumber">題目：1</div>
-    <div id="steps">步數：0</div>
-    <div id="timer">時間：0 秒</div>
-  </div>
   <div id="buttons">
     <button id="prevBtn"></button>
     <button id="resetBtn">重新開始</button>
@@ -107,27 +537,45 @@
   </div>
 </div>
 
-<!-- 左側 Gate 面板 -->
+<!-- 左側整合面板 -->
 <div class="left-panel">
-  <h3>選擇 BIT 數</h3>
-  <select id="bitSelector">
-    <option value="1">1 BIT</option>
-    <option value="2" selected>2 BIT</option>
-  </select>
-
-  <h3 style="margin-top:10px;">新增量子閘門</h3>
-  <div class="gate-btns">
-    <button class="gate-btn" onclick="applyGateAndAnimate({type:'X', target:0})">X q0</button>
-    <button class="gate-btn" onclick="applyGateAndAnimate({type:'X', target:1})">X q1</button>
-    <button class="gate-btn" onclick="applyGateAndAnimate({type:'CNOT', control:0, target:1})">1CNOT q0→q1</button>
-    <button class="gate-btn" onclick="applyGateAndAnimate({type:'CNOT', control:1, target:0})">1CNOT q1→q0</button>
-    <button class="gate-btn" onclick="applyGateAndAnimate({type:'0CNOT q0→q1'})">0CNOT q0→q1</button>
-    <button class="gate-btn" onclick="applyGateAndAnimate({type:'0CNOT q1→q0'})">0CNOT q1→q0</button>
+  <h3>遊戲資訊</h3>
+  <div id="info">
+    <div id="levelNumber">題目：1</div>
+    <div id="steps">步數：0</div>
+    <div id="timer">時間：0 秒</div>
   </div>
 
-  <h3 style="margin-top:10px;">目前電路</h3>
-  <div id="gateList" class="gate-list"></div>
-  <button class="reset-circuit-btn" onclick="resetCircuit()">重設電路</button>
+  <div class="gate-section">
+    <h3>選擇 BIT 數</h3>
+    <select id="bitSelector">
+      <option value="1">1 BIT</option>
+      <option value="2" selected>2 BIT</option>
+    </select>
+    <h3 style="margin-top:10px;">新增量子閘門</h3>
+    <div class="gate-btns">
+      <button class="gate-btn" onclick="applyGateAndAnimate({type:'X', target:0})">X q0</button>
+      <button class="gate-btn" onclick="applyGateAndAnimate({type:'X', target:1})">X q1</button>
+      <button class="gate-btn" onclick="applyGateAndAnimate({type:'CNOT', control:0, target:1})">1CNOT q0→q1</button>
+      <button class="gate-btn" onclick="applyGateAndAnimate({type:'CNOT', control:1, target:0})">1CNOT q1→q0</button>
+      <button class="gate-btn" onclick="applyGateAndAnimate({type:'0CNOT q0→q1'})">0CNOT q0→q1</button>
+      <button class="gate-btn" onclick="applyGateAndAnimate({type:'0CNOT q1→q0'})">0CNOT q1→q0</button>
+    </div>
+    <h3 style="margin-top:10px;">目前電路</h3>
+    <div id="gateList" class="gate-list"></div>
+    <button class="reset-circuit-btn" onclick="resetCircuit()">重設電路</button>
+    
+    <!-- 上一步按鈕 -->
+    <button id="undoBtn" onclick="undoLastStep()" disabled>回到上一步</button>
+  </div>
+</div>
+
+<!-- 底部電路圖面板 -->
+<div class="circuit-panel">
+  <h3>電路圖</h3>
+  <div id="circuitVisualization" class="circuit-visualization">
+    <!-- 電路將在這裡動態生成 -->
+  </div>
 </div>
 
 <!-- 成功彈窗 -->
@@ -138,6 +586,9 @@
     <button id="closePopup">再玩一次</button>
   </div>
 </div>
+
+<!-- 新增：隱藏電路按鈕（右上角） -->
+<button class="toggle-circuit-btn" id="toggleCircuitBtn" title="切換隱藏電路模式（或按 H 鍵）"></button>
 
 <script>
   /* ---------- 圖片 ---------- */
@@ -154,7 +605,6 @@
     "KuroFish":    raw+"KuroFish.png",
     "dollFish":    raw+"dollFish%20.png"
   };
-
   /* ---------- 24 個排列（0=00,1=01,2=10,3=11）---------- */
   const permList = [
    "0132","0213","0231","0312","0321",
@@ -162,7 +612,6 @@
     "2013","2031","2103","2130","2301","2310",
     "3012","3021","3102","3120","3201","3210"
   ].map(s => s.split("").map(Number));
-
   /* ---------- 關卡資料（2-bit 共有 24 題，行星固定） ---------- */
   let bitCount = 2;
   const bitLevels = {
@@ -185,10 +634,10 @@
         {id:"planet4", key:"doll",    top:280, left:280}
       ],
       princes: [
-        {img: fishImg["3flowerFish"], target:"planet1"}, // 00 的正確目標
-        {img: fishImg["BobFish"],     target:"planet2"}, // 01
-        {img: fishImg["KuroFish"],    target:"planet3"}, // 10
-        {img: fishImg["dollFish"],    target:"planet4"}  // 11
+        {img: fishImg["3flowerFish"], target:"planet1"},
+        {img: fishImg["BobFish"],     target:"planet2"},
+        {img: fishImg["KuroFish"],    target:"planet3"},
+        {img: fishImg["dollFish"],    target:"planet4"}
       ],
       lines: [
         ["line12","planet1","planet2"],
@@ -198,11 +647,8 @@
       ]
     }))
   };
-
   /* ---------- 2-bit：索引對應（固定不動的行星） ---------- */
-  // 0→planet1(00), 1→planet2(01), 2→planet3(10), 3→planet4(11)
   const indexToPlanetId = ["planet1","planet2","planet3","planet4"];
-
   /* ---------- 狀態變數 ---------- */
   let currentLevel = 0, steps = 0, startTime, timerInterval;
   let circuit = [], currentMap = [0,1,2,3];
@@ -211,11 +657,13 @@
   const timerDisplay = document.getElementById("timer");
   const container = document.getElementById("container");
   const svg = container.querySelector("svg");
-
+  
+  /* ---------- 新增：歷史記錄 ---------- */
+  let history = [];
+  const undoBtn = document.getElementById("undoBtn");
   /* ---------- 位元工具 ---------- */
   function stateIndexToBits(i){ return i.toString(2).padStart(bitCount,"0").split("").map(Number); }
   function bitsToStateIndex(bits){ return parseInt(bits.join(""),2); }
-
   /* ---------- Gate 應用（作用在狀態索引） ---------- */
   function applyGateToIndex(stateIndex, gate){
     const b = stateIndexToBits(stateIndex);
@@ -232,10 +680,23 @@
     }
     return bitsToStateIndex(nb);
   }
+  /* ---------- Gate 清單 ---------- */
+  function addGateToList(g){
+    circuit.push(g);
+    renderGateList();
+    renderCircuitVisualization();
+  }
 
-  /* ---------- 左側 Gate 清單 ---------- */
-  function addGateToList(g){ circuit.push(g); renderGateList(); }
-  function resetCircuit(){ circuit = []; currentMap = [0,1,2,3]; renderGateList(); softResetFish(); }
+  function resetCircuit(){
+    saveStateToHistory();
+    circuit = [];
+    currentMap = [0,1,2,3];
+    renderGateList();
+    renderCircuitVisualization();
+    softResetFish();
+    updateUndoButton();
+  }
+
   function renderGateList(){
     const box = document.getElementById("gateList"); box.innerHTML = "";
     circuit.forEach((g,idx)=>{
@@ -245,17 +706,136 @@
         g.type==="CNOT" ? `1CNOT q${g.control}→q${g.target}` : g.type
       }</span>`;
       const x = document.createElement("button"); x.className="remove"; x.textContent="x";
-      x.onclick = ()=>{ circuit.splice(idx,1); renderGateList(); };
+      x.onclick = ()=>{ 
+        saveStateToHistory();
+        circuit.splice(idx,1); 
+        renderGateList(); 
+        renderCircuitVisualization(); 
+        updateUndoButton();
+      };
       el.appendChild(x); box.appendChild(el);
     });
   }
+  /* ---------- 歷史記錄相關 ---------- */
+  function saveStateToHistory() {
+    const currentState = {
+      circuit: JSON.parse(JSON.stringify(circuit)),
+      currentMap: [...currentMap],
+      fishPositions: getCurrentFishPositions()
+    };
+    history.push(currentState);
+    if (history.length > 50) history.shift();
+    updateUndoButton();
+  }
+  function getCurrentFishPositions() {
+    const positions = {};
+    Object.keys(planets).forEach(planetId => {
+      const fish = planets[planetId].querySelector(".person");
+      if (fish) positions[planetId] = fish.src;
+    });
+    return positions;
+  }
+  function restoreFishPositions(positions) {
+    Object.values(planets).forEach(p => {
+      p.querySelectorAll(".person").forEach(img => img.remove());
+    });
+    Object.keys(positions).forEach(planetId => {
+      if (planets[planetId]) {
+        const img = document.createElement("img");
+        img.src = positions[planetId];
+        img.alt = "fish";
+        img.className = "person";
+        planets[planetId].appendChild(img);
+      }
+    });
+  }
+  function undoLastStep() {
+    if (history.length === 0) return;
+    const previousState = history.pop();
+    circuit = previousState.circuit;
+    currentMap = previousState.currentMap;
+    renderGateList();
+    renderCircuitVisualization();
+    restoreFishPositions(previousState.fishPositions);
+    steps = Math.max(0, steps - 1);
+    stepDisplay.textContent = `步數：${steps}`;
+    updateUndoButton();
+  }
+  function updateUndoButton() {
+    undoBtn.disabled = history.length === 0;
+  }
+  /* ---------- 電路視覺化 ---------- */
+  function renderCircuitVisualization() {
+    const container = document.getElementById("circuitVisualization");
+    container.innerHTML = "";
+    for (let i = 0; i < bitCount; i++) {
+        const lineDiv = document.createElement("div");
+        lineDiv.className = "circuit-line";
+        const labelDiv = document.createElement("div");
+        labelDiv.className = "circuit-line-label";
+        labelDiv.textContent = `q${i}`;
+        const pathDiv = document.createElement("div");
+        pathDiv.className = "circuit-line-path";
+        pathDiv.id = `circuit-line-${i}`;
+        lineDiv.appendChild(labelDiv);
+        lineDiv.appendChild(pathDiv);
+        container.appendChild(lineDiv);
+    }
+    const GRID_SIZE = 25;
+    circuit.forEach((gate, index) => {
+        const gatePosition = GRID_SIZE * (index + 1);
+        switch(gate.type) {
+            case "X":
+                addXGate(gate.target, gatePosition);
+                break;
+            case "CNOT":
+                addCNOTGate(gate.control, gate.target, gatePosition, false);
+                break;
+            case "0CNOT q0→q1":
+                addCNOTGate(0, 1, gatePosition, true);
+                break;
+            case "0CNOT q1→q0":
+                addCNOTGate(1, 0, gatePosition, true);
+                break;
+        }
+    });
+  }
 
-  /* ---------- 點 Gate → 動畫搬魚（依 gate 產生的 2-bit permutation） ---------- */
+  function addXGate(target, position) {
+    const line = document.getElementById(`circuit-line-${target}`);
+    const gate = document.createElement("div");
+    gate.className = "circuit-gate";
+    gate.textContent = "X";
+    gate.style.left = `${position}px`;
+    line.appendChild(gate);
+  }
+
+  function addCNOTGate(control, target, position, isHollow) {
+    const lineHeight = Math.abs(target - control) * 22;
+    const minLine = Math.min(control, target);
+    const controlLine = document.getElementById(`circuit-line-${control}`);
+    const controlDot = document.createElement("div");
+    controlDot.className = isHollow ? "circuit-control hollow" : "circuit-control";
+    controlDot.style.left = `${position}px`;
+    controlLine.appendChild(controlDot);
+    const targetLine = document.getElementById(`circuit-line-${target}`);
+    const targetDot = document.createElement("div");
+    targetDot.className = "circuit-target";
+    targetDot.style.left = `${position-2.2}px`;
+    targetLine.appendChild(targetDot);
+    const connector = document.createElement("div");
+    connector.className = "circuit-connector";
+    connector.style.left = `${60 + position}px`;
+    connector.style.top = `${64 +10+ minLine * 25}px`;
+    connector.style.height = `${lineHeight}px`;
+    document.getElementById("circuitVisualization").appendChild(connector);
+  }
+
+  /* ---------- 點 Gate → 動畫搬魚 ---------- */
   function applyGateAndAnimate(gate){
+    saveStateToHistory();
     addGateToList(gate);
     currentMap = currentMap.map(x => applyGateToIndex(x, gate));
-
-    // 單一步對應（fromIdx -> toIdx）
     const perm = [0,1,2,3].map(i => applyGateToIndex(i, gate));
     perm.forEach((toIdx,fromIdx)=>{
       const planetList = getCurrentLevel().planets;
@@ -273,20 +853,16 @@
         checkSuccess();
       },800);
     });
-
     steps++; stepDisplay.textContent = `步數：${steps}`;
+    updateUndoButton();
   }
-
   function getCurrentLevel(){ return bitLevels[bitCount][currentLevel]; }
-
-  /* ---------- 載入關卡（貓固定、魚依 permList[level] 放置） ---------- */
+  /* ---------- 載入關卡 ---------- */
   function loadLevel(idx){
     document.getElementById("levelNumber").textContent = `題目：${idx+1}`;
     container.querySelectorAll(".planet").forEach(p=>p.remove());
     svg.innerHTML=""; planets = {};
-
     const level = getCurrentLevel();
-    // 1) 畫出四顆固定行星
     level.planets.forEach(p=>{
       const div = document.createElement("div");
       div.className = "planet"; div.id = p.id;
@@ -296,8 +872,6 @@
       container.appendChild(div);
       planets[p.id] = div;
     });
-
-    // 2) 邊線（可點互換動畫）
     level.lines.forEach(([id,p1,p2])=>{
       const line = document.createElementNS("http://www.w3.org/2000/svg","line");
       const pl1 = level.planets.find(x=>x.id===p1);
@@ -308,63 +882,70 @@
       svg.appendChild(line);
       line.addEventListener("mouseenter",()=>{line.style.stroke="#ffcc00"; line.style.strokeWidth=8;});
       line.addEventListener("mouseleave",()=>{line.style.stroke="#555"; line.style.strokeWidth=4;});
-      line.addEventListener("click",()=>swap(p1,p2));
+      line.addEventListener("click",()=>onLineClick(p1,p2));
     });
-
-    // 3) 目標（過關用）：固定不變（00 應到 planet1，01→planet2，…）
     princes = JSON.parse(JSON.stringify(level.princes));
-
-    // 4) 魚依 permList[levelIdx] 初始擺放（貓不動）
     placePrincesByFixedArrangement(idx);
-
-    // reset counters
     steps = 0; stepDisplay.textContent = "步數：0";
     startTimer();
+    renderCircuitVisualization();
+    history = [];
+    updateUndoButton();
   }
-
-  /* ---------- 依 24 排列放魚（貓不動） ---------- */
-function placePrincesByFixedArrangement(levelIdx){
-  const keys = indexToPlanetId; // ["planet1","planet2","planet3","planet4"]
-  // 先清空舊魚
-  Object.values(planets).forEach(p =>
-    p.querySelectorAll(".person").forEach(img => img.remove())
-  );
-
-  if (bitCount === 1) {
-    // 1-bit：兩顆行星，直接互換（保持你原本行為）
-    princes.forEach((prince, i) => {
+  /* ---------- 依 24 排列放魚 ---------- */
+  function placePrincesByFixedArrangement(levelIdx){
+    const keys = indexToPlanetId;
+    Object.values(planets).forEach(p =>
+      p.querySelectorAll(".person").forEach(img => img.remove())
+    );
+    if (bitCount === 1) {
+      princes.forEach((prince, i) => {
+        const img = document.createElement("img");
+        img.src = prince.img;
+        img.alt = "fish";
+        img.className = "person";
+        const planetId = i === 0 ? "planet2" : "planet1";
+        planets[planetId].appendChild(img);
+      });
+      return;
+    }
+    const perm = permList[levelIdx];
+    const fishImgs = [
+      fishImg["3flowerFish"],
+      fishImg["BobFish"],
+      fishImg["KuroFish"],
+      fishImg["dollFish"]
+    ];
+    for (let pos = 0; pos < 4; pos++) {
+      const fishIndex = perm[pos];
       const img = document.createElement("img");
-      img.src = prince.img;
+      img.src = fishImgs[fishIndex];
       img.alt = "fish";
       img.className = "person";
-      const planetId = i === 0 ? "planet2" : "planet1";
+      const planetId = keys[pos];
       planets[planetId].appendChild(img);
-    });
-    return;
+    }
   }
-
-  // 2-bit：用 permList 指定的排列（「位置 -> 魚」）
-  // perm[p] = 放在位置 p 的魚編號（0=00, 1=01, 2=10, 3=11）
-  const perm = permList[levelIdx]; // 0~23 對應你給的順序
-  const fishImgs = [
-    fishImg["3flowerFish"], // 0 (00)
-    fishImg["BobFish"],     // 1 (01)
-    fishImg["KuroFish"],    // 2 (10)
-    fishImg["dollFish"]     // 3 (11)
-  ];
-
-  for (let pos = 0; pos < 4; pos++) {
-    const fishIndex = perm[pos];          // 這個位置應該放哪一隻魚
-    const img = document.createElement("img");
-    img.src = fishImgs[fishIndex];
-    img.alt = "fish";
-    img.className = "person";
-    const planetId = keys[pos];          // 位置 0,1,2,3 = 左上/右上/左下/右下
-    planets[planetId].appendChild(img);
+  function onLineClick(p1, p2) {
+    const mapKey = `${p1},${p2}`;
+    const mapKeyRev = `${p2},${p1}`;
+    const mapping = {
+      "planet1,planet2": { type: "0CNOT q0→q1", gateObj: { type:"0CNOT q0→q1" } },
+      "planet1,planet3": { type: "0CNOT q1→q0", gateObj: { type:"0CNOT q1→q0" } },
+      "planet2,planet4": { type: "CNOT", gateObj: { type:"CNOT", control:1, target:0 } },
+      "planet3,planet4": { type: "CNOT", gateObj: { type:"CNOT", control:0, target:1 } }
+    };
+    const entry = mapping[mapKey] || mapping[mapKeyRev];
+    if (!entry) return swap(p1,p2);
+    if (entry.gateObj && entry.gateObj.type === "CNOT") {
+      applyGateAndAnimate({ type: "CNOT", control: entry.gateObj.control, target: entry.gateObj.target });
+    } else {
+      applyGateAndAnimate({ type: entry.type });
+    }
   }
-}
-  /* ---------- 點線互換動畫（不改貓，只換兩行星上的魚） ---------- */
+  /* ---------- 點線互換動畫 ---------- */
   function swap(p1,p2){
+    saveStateToHistory();
     const a = planets[p1].querySelector(".person");
     const b = planets[p2].querySelector(".person");
     if(!a||!b) return;
@@ -379,10 +960,10 @@ function placePrincesByFixedArrangement(levelIdx){
       planets[p2].appendChild(a);
       a.style.transform = b.style.transform = "translate(-50%,-50%)";
       checkSuccess();
+      updateUndoButton();
     },800);
   }
-
-  /* ---------- 判定過關：每條魚是否回到對應目標行星 ---------- */
+  /* ---------- 判定過關 ---------- */
   function checkSuccess(){
     const ok = princes.every(prince=>{
       const img = planets[prince.target].querySelector(".person");
@@ -393,7 +974,6 @@ function placePrincesByFixedArrangement(levelIdx){
       showPopup(steps, Math.floor((Date.now()-startTime)/1000));
     }
   }
-
   /* ---------- 計時器 / 重設 ---------- */
   function startTimer(){
     clearInterval(timerInterval);
@@ -411,22 +991,22 @@ function placePrincesByFixedArrangement(levelIdx){
     steps = 0; stepDisplay.textContent = "步數：0";
     placePrincesByFixedArrangement(currentLevel);
     startTimer();
+    history = [];
+    updateUndoButton();
   }
-
   /* ---------- 事件繫結 ---------- */
   document.getElementById("closePopup").onclick = ()=>{
     document.getElementById("successPopup").style.display = "none";
+    resetCircuit();
     softResetFish();
   };
   document.getElementById("resetBtn").onclick = ()=>{ resetCircuit(); };
-
   document.getElementById("bitSelector").onchange = (e)=>{
     bitCount = parseInt(e.target.value);
     currentLevel = 0;
     loadLevel(currentLevel);
     resetCircuit();
   };
-
   let animating=false;
   function transitionLevel(nextIdx,dir){
     if(animating) return; animating = true;
@@ -453,10 +1033,31 @@ function placePrincesByFixedArrangement(levelIdx){
     resetCircuit();
   };
 
+  /* ==================== 新增：隱藏電路功能 ==================== */
+  const toggleBtn = document.getElementById('toggleCircuitBtn');
+  let circuitHidden = false;
+
+  toggleBtn.addEventListener('click', () => {
+    circuitHidden = !circuitHidden;
+    if (circuitHidden) {
+      document.body.classList.add('hide-circuit-mode');
+    } else {
+      document.body.classList.remove('hide-circuit-mode');
+    }
+  });
+
+  // 按鍵盤 H 鍵快速切換（超好用）
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'h') {
+      toggleBtn.click();
+    }
+  });
+
   /* ---------- 啟動 ---------- */
   loadLevel(currentLevel);
 </script>
 </body>
 </html>
+
 
 
