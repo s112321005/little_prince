@@ -11,8 +11,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
-        padding-top: 40px;
+        justify-content: center; /* 保持中上佈局 */
+        padding-top: 0;
+        padding-bottom: 160px;
         height: 100vh;
         background: #d6cc98;
         font-family: sans-serif;
@@ -32,7 +33,9 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        max-width: 500px;
+        max-width: 640px;
+        position: relative;
+        z-index: 50;
     }
     #container {
         position: relative;
@@ -54,6 +57,7 @@
         border: 3px solid #fff;
         box-shadow: 0 4px 10px rgba(0,0,0,.2);
         transition: all 0.4s ease;
+        z-index: 10;
     }
     .planet img {
         width: 100%;
@@ -80,6 +84,9 @@
         left: 0;
         width: 100%;
         height: 100%;
+        z-index: 1;
+        pointer-events: auto;
+        overflow: visible;
     }
     line {
         stroke: #555;
@@ -101,13 +108,13 @@
         left: 50%;
         transform: translate(-50%,-50%);
         transition: all 0.4s ease;
+        z-index: 20;
     }
 
-    /* 以下是你原本全部的 CSS，完全沒動 */
     .left-panel {
         position: absolute;
         left: 10px;
-        top: 50px;
+        top: 12vh;
         width: 220px;
         background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(10px);
@@ -117,7 +124,7 @@
         font-size: 14px;
         color: #1e293b;
         z-index: 100;
-        max-height: 85vh;
+        max-height: 75vh;
         overflow-y: auto;
         transition: all 0.4s ease;
     }
@@ -139,6 +146,8 @@
         #container { width: 380px; height: 380px; }
         .planet { width: 120px; height: 120px; }
         .person { width: 80px; height: 80px; }
+        body { padding-bottom: 200px; }
+        .left-panel { top: 60px; }
     }
     .slide-out-left { animation: slideOutLeft .6s forwards; }
     .slide-in-right { animation: slideInRight .6s forwards; }
@@ -168,10 +177,12 @@
     #undoBtn { padding: 8px 16px; background: #7a654f; color: #fff; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 10px; width: 100%; }
     #undoBtn:hover { background: #5c4d3a; }
     #undoBtn:disabled { background: #cccccc; cursor: not-allowed; }
+    
     .circuit-panel { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 3000px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 14px; color: #1e293b; z-index: 100; transition: all 0.4s ease; }
     .circuit-panel h3 { margin: 0 0 10px; font-size: 15px; color: #1e293b; text-align: center; }
-    .circuit-visualization { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-    .circuit-line { display: flex; align-items: center; height: 25px; }
+    /* 修正：加上 relative 讓絕對定位的連接線可以正確對齊容器 */
+    .circuit-visualization { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; position: relative; }
+    .circuit-line { display: flex; align-items: center; height: 25px; position: relative; z-index: 10;}
     .circuit-line-label { width: 30px; text-align: center; font-weight: bold; font-size: 12px; }
     .circuit-line-path { flex: 1; height: 2px; background: #111111; position: relative; margin: 0 10px; }
     .circuit-gate { position: absolute; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; border-radius: 4px; background: #7a654f; color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; }
@@ -179,7 +190,7 @@
     .circuit-control.hollow { background: white !important; border: 2px solid #000000 !important; }
     .circuit-target { position: absolute; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; border-radius: 50%; color: #111111; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
     .circuit-target::after { content: "⊕"; }
-    .circuit-connector { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 2px; height: 100%; background: #111111; }
+    .circuit-connector { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 2px; height: 100%; background: #111111; z-index: 1;}
     .hide-circuit-mode .left-panel, .hide-circuit-mode .circuit-panel { transform: translateX(-120%) !important; opacity: 0; pointer-events: none; }
     .hide-circuit-mode .circuit-panel { transform: translateY(120%) !important; }
     .toggle-circuit-btn { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; background: rgba(122, 101, 79, 0.9); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(8px); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
@@ -215,8 +226,7 @@
     </select>
     <h3 style="margin-top:10px;">新增量子閘門</h3>
     <div class="gate-btns">
-      <!-- 按鈕會由 JS 動態產生 -->
-    </div>
+      </div>
     <h3 style="margin-top:10px;">目前電路</h3>
     <div id="gateList" class="gate-list"></div>
     <button class="reset-circuit-btn" onclick="resetCircuit()">重設電路</button>
@@ -321,15 +331,18 @@ const bitLevels = {
     lines: [["line12","planet1","planet2"],["line13","planet1","planet3"],["line24","planet2","planet4"],["line34","planet3","planet4"]]
   })),
   3: permList3bit.map(() => ({
+    // 3bit 位置拉開
     planets: [
-      {id:"planet0", key:"3flower", label:"000", top:100, left:100},
-      {id:"planet1", key:"Bob",     label:"001", top:100, left:220},
-      {id:"planet2", key:"Kurover", label:"010", top:220, left:100},
-      {id:"planet3", key:"Siam",    label:"011", top:220, left:220},
+      // 內層 (0xx)
+      {id:"planet0", key:"3flower", label:"000", top:140, left:140},
+      {id:"planet1", key:"Bob",     label:"001", top:140, left:340},
+      {id:"planet2", key:"Kurover", label:"010", top:340, left:140},
+      {id:"planet3", key:"Siam",    label:"011", top:340, left:340},
+      // 外層 (1xx) - 往外擴張
       {id:"planet4", key:"Black",   label:"100", top:20,  left:20},
-      {id:"planet5", key:"Bins",    label:"101", top:20,  left:300},
-      {id:"planet6", key:"Sakaban", label:"110", top:300, left:20},
-      {id:"planet7", key:"White",   label:"111", top:300, left:300}
+      {id:"planet5", key:"Bins",    label:"101", top:20,  left:460},
+      {id:"planet6", key:"Sakaban", label:"110", top:460, left:20},
+      {id:"planet7", key:"White",   label:"111", top:460, left:460}
     ],
     princes: [
       {img: fishImg3["3flowerFish"], target:"planet0"},
@@ -368,9 +381,22 @@ function applyGateToIndex(stateIndex, gate){
   const b = stateIndexToBits(stateIndex);
   const nb = b.slice();
   switch(gate.type){
-    case "X": nb[gate.target] ^= 1; break;
-    case "CNOT": if(nb[gate.control]) nb[gate.target] ^= 1; break;
-    case "0CNOT": if(nb[gate.control]===0) nb[gate.target] ^= 1; break;
+    case "X": 
+      nb[gate.target] ^= 1; 
+      break;
+    case "CNOT": 
+      if(nb[gate.control]) nb[gate.target] ^= 1; 
+      break;
+    case "0CNOT": 
+      if(nb[gate.control]===0) nb[gate.target] ^= 1; 
+      break;
+    case "CCNOT":
+      const c1Ok = (gate.c1Val === 1) ? (nb[gate.control1] === 1) : (nb[gate.control1] === 0);
+      const c2Ok = (gate.c2Val === 1) ? (nb[gate.control2] === 1) : (nb[gate.control2] === 0);
+      if(c1Ok && c2Ok) {
+        nb[gate.target] ^= 1;
+      }
+      break;
   }
   return bitsToStateIndex(nb);
 }
@@ -412,26 +438,35 @@ function renderGateButtons(){
   });
 }
 
-/* ==================== 其餘函數（你原本的全部保留，只改少數地方支援 3bit） ==================== */
+/* ==================== 其餘函數 ==================== */
 function addGateToList(g){ circuit.push(g); renderGateList(); renderCircuitVisualization(); }
 function resetCircuit(){
   saveStateToHistory();
-  circuit = []; currentMap = Array.from({length: 1<<bitCount}, (_,i)=>i);
-  renderGateList(); renderCircuitVisualization(); softResetFish(); updateUndoButton();
+  circuit = []; 
+  currentMap = Array.from({length: 1<<bitCount}, (_,i)=>i);
+  renderGateList(); 
+  renderCircuitVisualization(); 
+  softResetFish(); 
+  updateUndoButton();
 }
 function renderGateList(){
   const box = document.getElementById("gateList"); box.innerHTML = "";
   circuit.forEach((g,idx)=>{
     const el = document.createElement("div"); el.className = "gate-badge";
-    const label = g.type==="X" ? `X q${g.target}` : g.type==="CNOT" ? `1CNOT q${g.control}→q${g.target}` : `0CNOT q${g.control}→q${g.target}`;
+    let label = "";
+    if(g.type==="X") label = `X q${g.target}`;
+    else if(g.type==="CNOT") label = `1CNOT q${g.control}→q${g.target}`;
+    else if(g.type==="0CNOT") label = `0CNOT q${g.control}→q${g.target}`;
+    else if(g.type==="CCNOT") {
+      label = `${g.c1Val}${g.c2Val}CNOT q${g.control1},q${g.control2}→q${g.target}`;
+    }
     el.innerHTML = `<span>${label}</span>`;
     const x = document.createElement("button"); x.className="remove"; x.textContent="x";
     x.onclick = ()=>{ saveStateToHistory(); circuit.splice(idx,1); renderGateList(); renderCircuitVisualization(); updateUndoButton(); };
     el.appendChild(x); box.appendChild(el);
   });
 }
-
-/* 歷史與 undo（你原本的） */
+/* 歷史與 undo */
 function saveStateToHistory() {
   const state = { circuit: JSON.parse(JSON.stringify(circuit)), currentMap: [...currentMap], fish: getCurrentFishPositions() };
   history.push(state);
@@ -464,8 +499,8 @@ function undoLastStep(){
 }
 function updateUndoButton(){ undoBtn.disabled = history.length === 0; }
 
-/* 電路視覺化（你原本的，3bit 也相容） */
-function renderCircuitVisualization(){ /* 你原本完整函數貼這裡 */ 
+/* 電路視覺化 */
+function renderCircuitVisualization(){
   const c = document.getElementById("circuitVisualization"); c.innerHTML = "";
   for(let i=0; i<bitCount; i++){
     const line = document.createElement("div"); line.className="circuit-line";
@@ -478,22 +513,92 @@ function renderCircuitVisualization(){ /* 你原本完整函數貼這裡 */
     if(gate.type==="X") addXGate(gate.target, pos);
     else if(gate.type==="CNOT") addCNOTGate(gate.control, gate.target, pos, false);
     else if(gate.type==="0CNOT") addCNOTGate(gate.control, gate.target, pos, true);
+    else if(gate.type==="CCNOT") addCCNOTGate(gate, pos);
   });
 }
+
 function addXGate(t,p){ const l=document.getElementById(`circuit-line-${t}`); const g=document.createElement("div"); g.className="circuit-gate"; g.textContent="X"; g.style.left=p+"px"; l.appendChild(g); }
-function addCNOTGate(c,t,p,hollow){
-  const lineH = Math.abs(t-c)*22;
-  const min = Math.min(c,t);
-  const cl = document.getElementById(`circuit-line-${c}`);
-  const cd = document.createElement("div"); cd.className = hollow ? "circuit-control hollow" : "circuit-control"; cd.style.left=p+"px"; cl.appendChild(cd);
-  const tl = document.getElementById(`circuit-line-${t}`);
-  const td = document.createElement("div"); td.className="circuit-target"; td.style.left=(p-2.2)+"px"; tl.appendChild(td);
-  const conn = document.createElement("div"); conn.className="circuit-connector";
-  conn.style.left=(60+p)+"px"; conn.style.top=(64+10+min*25)+"px"; conn.style.height=lineH+"px";
-  document.getElementById("circuitVisualization").appendChild(conn);
+
+/* === 新的連線函式 === */
+function addCNOTGate(c, t, p, hollow) {
+    // 每一行高度 25px + gap 8px = 33px
+    const ROW_H = 33;
+    const min = Math.min(c, t);
+    const max = Math.max(c, t);
+   
+    // 計算連接線的高度與位置
+    // 12.5 是行高的一半，確保線條從圓心開始
+    const topPos = (min * ROW_H) + 12.5;
+    const height = (max - min) * ROW_H;
+
+    // 畫垂直連接線
+    const container = document.getElementById("circuitVisualization");
+    const conn = document.createElement("div");
+    conn.className = "circuit-connector";
+    conn.style.left = (46 + p) + "px"; // 46 是左邊 Label 的偏移量
+    conn.style.top = (topPos+5) + "px";
+    conn.style.height = (height-10) + "px";
+    conn.style.transform = "none"; // 重要：取消 CSS 的置中偏移
+    container.appendChild(conn);
+
+    // 畫控制點 (圓點)
+    const cl = document.getElementById(`circuit-line-${c}`);
+    const cd = document.createElement("div");
+    cd.className = hollow ? "circuit-control hollow" : "circuit-control";
+    cd.style.left = p + "px";
+    cl.appendChild(cd);
+
+    // 畫目標點 (⊕)
+    const tl = document.getElementById(`circuit-line-${t}`);
+    const td = document.createElement("div");
+    td.className = "circuit-target";
+    td.style.left = (p - 2.2) + "px";
+    tl.appendChild(td);
 }
 
-/* 核心：套用閘門 + 魚動畫（支援 1~8 狀態） */
+function addCCNOTGate(g, p) {
+    // 每一行高度 25px + gap 8px = 33px
+    const ROW_H = 33;
+    const lines = [g.control1, g.control2, g.target].sort((a, b) => a - b);
+    const min = lines[0];
+    const max = lines[2]; // 取最大和最小的行號
+
+    const topPos = (min * ROW_H) + 12.5;
+    const height = (max - min) * ROW_H;
+
+    // 畫垂直連接線 (貫穿這三點)
+    const container = document.getElementById("circuitVisualization");
+    const conn = document.createElement("div");
+    conn.className = "circuit-connector";
+    conn.style.left = (46 + p) + "px";
+    conn.style.top = (topPos+5) + "px";
+    conn.style.height = (height-10) + "px";
+    conn.style.transform = "none"; // 重要：取消 CSS 的置中偏移
+    container.appendChild(conn);
+
+    // 畫控制點 1
+    const c1l = document.getElementById(`circuit-line-${g.control1}`);
+    const c1d = document.createElement("div");
+    c1d.className = g.c1Val === 0 ? "circuit-control hollow" : "circuit-control";
+    c1d.style.left = p + "px";
+    c1l.appendChild(c1d);
+
+    // 畫控制點 2
+    const c2l = document.getElementById(`circuit-line-${g.control2}`);
+    const c2d = document.createElement("div");
+    c2d.className = g.c2Val === 0 ? "circuit-control hollow" : "circuit-control";
+    c2d.style.left = p + "px";
+    c2l.appendChild(c2d);
+
+    // 畫目標點 (⊕)
+    const tl = document.getElementById(`circuit-line-${g.target}`);
+    const td = document.createElement("div");
+    td.className = "circuit-target";
+    td.style.left = (p - 2.2) + "px";
+    tl.appendChild(td);
+}
+
+/* 核心：套用閘門 + 魚動畫 */
 function applyGateAndAnimate(gate){
   saveStateToHistory();
   addGateToList(gate);
@@ -523,10 +628,8 @@ function loadLevel(idx){
   const level = getCurrentLevel();
   const is3bit = bitCount===3;
   const planetSize = is3bit ? 90 : 140;
-  const personSize = is3bit ? 55 : 90;
-  const offset = is3bit ? 45 : 70;
-
-  container.style.width = container.style.height = is3bit ? "450px" : "420px";
+  
+  container.style.width = container.style.height = is3bit ? "600px" : "420px";
 
   level.planets.forEach(p=>{
     const div = document.createElement("div");
@@ -541,6 +644,8 @@ function loadLevel(idx){
     planets[p.id] = div;
   });
 
+  const offset = is3bit ? 45 : 70;
+
   level.lines.forEach(([id,p1,p2])=>{
     const line = document.createElementNS("http://www.w3.org/2000/svg","line");
     const pl1 = level.planets.find(x=>x.id===p1);
@@ -551,7 +656,7 @@ function loadLevel(idx){
     svg.appendChild(line);
     line.addEventListener("mouseenter",()=>{line.style.stroke="#ffcc00"; line.style.strokeWidth="8";});
     line.addEventListener("mouseleave",()=>{line.style.stroke="#555"; line.style.strokeWidth="4";});
-    if(!is3bit) line.addEventListener("click",()=>onLineClick(p1,p2));
+    line.addEventListener("click",()=>onLineClick(p1,p2));
   });
 
   princes = JSON.parse(JSON.stringify(level.princes));
@@ -573,7 +678,14 @@ function placePrincesByFixedArrangement(idx){
       planets[ids[pos]].appendChild(img);
     });
   } else if(bitCount===1){
-    // 你原本 1bit 放魚邏輯
+    const ids = ["planet1","planet2"];
+    const fishList = [fishImg["3flowerFish"], fishImg["BobFish"]];
+    fishList.forEach((src, i) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.className = "person";
+        planets[ids[i]].appendChild(img);
+    });
   } else {
     const perm = permList[idx];
     const fishOrder = [fishImg["3flowerFish"], fishImg["BobFish"], fishImg["KuroFish"], fishImg["dollFish"]];
@@ -603,18 +715,60 @@ function startTimer(){
 function showPopup(s,t){ document.querySelector("#successPopup p").innerHTML = `哇！你走了 ${s} 步，花了 ${t} 秒，讓每隻貓都吃到對應的魚耶~`; document.getElementById("successPopup").style.display = "flex"; }
 function softResetFish(){ steps=0; stepDisplay.textContent="步數：0"; placePrincesByFixedArrangement(currentLevel); startTimer(); history=[]; updateUndoButton(); }
 
-/* 你原本的點連線交換（僅 2bit 時生效） */
-function onLineClick(p1,p2){ /* 你原本完整程式碼 */ }
+function onLineClick(p1, p2) {
+  const key = [p1, p2].sort().join(",");
 
-/* 事件綁定（你原本的） */
+  if (bitCount === 1) {
+    applyGateAndAnimate({ type: "X", target: 0 });
+    return;
+  }
+
+  if (bitCount === 2) {
+    const map2 = {
+      "planet1,planet2": { type: "0CNOT", control: 0, target: 1 },
+      "planet1,planet3": { type: "0CNOT", control: 1, target: 0 },
+      "planet2,planet4": { type: "CNOT",  control: 1, target: 0 },
+      "planet3,planet4": { type: "CNOT",  control: 0, target: 1 }
+    };
+    if (map2[key]) applyGateAndAnimate(map2[key]);
+    return;
+  }
+
+  if (bitCount === 3) {
+    const map3 = {
+      // q0 (LSB) 改變
+      "planet0,planet1": { type: "CCNOT", control1: 0, c1Val: 0, control2: 1, c2Val: 0, target: 2 },
+      "planet2,planet3": { type: "CCNOT", control1: 0, c1Val: 0, control2: 1, c2Val: 1, target: 2 },
+      "planet4,planet5": { type: "CCNOT", control1: 0, c1Val: 1, control2: 1, c2Val: 0, target: 2 },
+      "planet6,planet7": { type: "CCNOT", control1: 0, c1Val: 1, control2: 1, c2Val: 1, target: 2 },
+
+      // q1 (Middle) 改變
+      "planet0,planet2": { type: "CCNOT", control1: 0, c1Val: 0, control2: 2, c2Val: 0, target: 1 },
+      "planet1,planet3": { type: "CCNOT", control1: 0, c1Val: 0, control2: 2, c2Val: 1, target: 1 },
+      "planet4,planet6": { type: "CCNOT", control1: 0, c1Val: 1, control2: 2, c2Val: 0, target: 1 },
+      "planet5,planet7": { type: "CCNOT", control1: 0, c1Val: 1, control2: 2, c2Val: 1, target: 1 },
+
+      // q2 (MSB) 改變
+      "planet0,planet4": { type: "CCNOT", control1: 1, c1Val: 0, control2: 2, c2Val: 0, target: 0 },
+      "planet1,planet5": { type: "CCNOT", control1: 1, c1Val: 0, control2: 2, c2Val: 1, target: 0 },
+      "planet2,planet6": { type: "CCNOT", control1: 1, c1Val: 1, control2: 2, c2Val: 0, target: 0 },
+      "planet3,planet7": { type: "CCNOT", control1: 1, c1Val: 1, control2: 2, c2Val: 1, target: 0 }
+    };
+
+    if (map3[key]) applyGateAndAnimate(map3[key]);
+    return;
+  }
+}
+
 document.getElementById("closePopup").onclick = ()=>{ document.getElementById("successPopup").style.display="none"; resetCircuit(); };
 document.getElementById("resetBtn").onclick = ()=>{ resetCircuit(); };
 document.getElementById("bitSelector").onchange = (e)=>{
   bitCount = parseInt(e.target.value);
   currentLevel = 0;
+  circuit = []; 
   renderGateButtons();
   loadLevel(currentLevel);
-  resetCircuit();
+  resetCircuit(); 
 };
 let animating=false;
 function transitionLevel(next,dir){
@@ -641,4 +795,3 @@ loadLevel(currentLevel);
 </script>
 </body>
 </html>
-
