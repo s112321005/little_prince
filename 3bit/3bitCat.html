@@ -11,9 +11,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center; /* 保持中上佈局 */
-        padding-top: 0;
-        padding-bottom: 160px;
+        justify-content: flex-start; /* 改回 flex-start */
+        padding-top: 20px; /* 減少頂部間距 */
+        padding-bottom: 120px; /* 減少底部間距 */
         height: 100vh;
         background: #d6cc98;
         font-family: sans-serif;
@@ -23,7 +23,7 @@
     body {
         margin: 0;
         overflow: hidden;
-        background-image: url("https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=2000&q=80");
+        background-image: url("");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -45,8 +45,6 @@
         margin: 0 auto;
         transition: all 0.4s ease;
     }
-
-
     /* 美化下拉選單 */
     #bitSelector {
         width: 100%;
@@ -64,14 +62,10 @@
         background-position: right 12px center;
         background-size: 12px;
     }
-
-
     #bitSelector:hover {
         border-color: #7a654f;
         box-shadow: 0 2px 8px rgba(122, 101, 79, 0.1);
     }
-
-
     #bitSelector:focus {
         outline: none;
         border-color: #7a654f;
@@ -142,14 +136,10 @@
         transition: all 0.4s ease;
         z-index: 20;
     }
-
-
-
-
     .left-panel {
         position: absolute;
         left: 10px;
-        top: 12vh;
+        top: 3vh;
         width: 220px;
         background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(10px);
@@ -179,8 +169,6 @@
         width: 100%;
         position: relative;
     }
-
-
     #prevBtn, #nextBtn {
         width: 50px;
         height: 50px;
@@ -198,8 +186,6 @@
         top: 50%;
         transform: translateY(-50%);
     }
-
-
     #buttons {
         display: flex;
         justify-content: center;
@@ -207,8 +193,6 @@
         margin-top: 15px;
         width: 100%;
     }
-
-
     #prevBtn, #nextBtn {
         width: 50px;
         height: 50px;
@@ -225,13 +209,9 @@
         position: static; /* 移除絕對定位 */
         transform: none; /* 移除 transform */
     }
-
-
     /* 移除位置設定 */
     /* #prevBtn { left: 5%; } */
     /* #nextBtn { right: 5%; } */
-
-
     #prevBtn::after {
         content: "◀";
         position: relative;
@@ -239,8 +219,6 @@
         right: 3px;
         font-size: 1.5rem;
     }
-
-
     #nextBtn::after {
         content: "▶";
         position: relative;
@@ -248,8 +226,6 @@
         left: 3px;
         font-size: 1.5rem;
     }
-
-
     #prevBtn:hover, #nextBtn:hover {
         background-color: #5c4d3a;
         color: white;
@@ -290,7 +266,7 @@
     #undoBtn:hover { background: #5c4d3a; }
     #undoBtn:disabled { background: #cccccc; cursor: not-allowed; }
    
-    .circuit-panel { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 3000px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 14px; color: #1e293b; z-index: 100; transition: all 0.4s ease; }
+    .circuit-panel { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 1000px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 14px; color: #1e293b; z-index: 100; transition: all 0.4s ease; }
     .circuit-panel h3 { margin: 0 0 10px; font-size: 15px; color: #1e293b; text-align: center; }
     /* 修正：加上 relative 讓絕對定位的連接線可以正確對齊容器 */
     .circuit-visualization { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; position: relative; }
@@ -321,10 +297,6 @@
     <button id="nextBtn"></button>
   </div>
 </div>
-
-
-
-
 <div class="left-panel">
   <h3>遊戲資訊</h3>
   <div id="info">
@@ -348,18 +320,10 @@
     <button id="undoBtn" onclick="undoLastStep()" disabled>回到上一步</button>
   </div>
 </div>
-
-
-
-
 <div class="circuit-panel">
   <h3>電路圖</h3>
   <div id="circuitVisualization" class="circuit-visualization"></div>
 </div>
-
-
-
-
 <div id="successPopup" class="popup">
   <div class="popup-content">
     <h2>Congratulations 成功！</h2>
@@ -367,15 +331,7 @@
     <button id="closePopup">再玩一次</button>
   </div>
 </div>
-
-
-
-
 <button class="toggle-circuit-btn" id="toggleCircuitBtn" title="切換隱藏電路模式（或按 H 鍵）"></button>
-
-
-
-
 <script>
 /* ==================== 原始 1/2 bit 圖片與資料 ==================== */
 const raw = "https://raw.githubusercontent.com/s112321005/little_prince/main/";
@@ -391,8 +347,6 @@ const fishImg = {
   "KuroFish":    raw+"KuroFish.png",
   "dollFish":    raw+"dollFish%20.png"
 };
-
-
 
 
 /* ==================== 3 bit 圖片與資料 ==================== */
@@ -430,8 +384,6 @@ const permList = [
 ].map(s => s.split("").map(Number));
 
 
-
-
 /* ==================== 3bit 隨機排列 ==================== */
 function gen3bitPerm() {
   let a = [0,1,2,3,4,5,6,7];
@@ -443,7 +395,15 @@ function gen3bitPerm() {
 }
 const permList3bit = Array.from({length: 30}, gen3bitPerm);
 permList3bit.push([7, 6, 5, 4, 3, 2, 1, 0]);
-
+permList3bit.push([1,0,3,2,5,7,4,6]);
+permList3bit.push([7,0,1,2,3,4,5,6]);
+permList3bit.push([0,1,2,3,4,6,5,7]);
+permList3bit.push([0,1,2,4,3,5,6,7]);
+permList3bit.push([1,2,3,4,5,6,7,0]);
+permList3bit.push([3,6,2,5,7,1,0,4]);
+permList3bit.push([1,2,7,5,6,3,0,4]);
+permList3bit.push([4,3,0,2,7,5,6,1]);
+permList3bit.push([7,5,2,4,6,1,0,3]);
 
 
 /* ==================== 關卡資料 ==================== */
@@ -516,15 +476,9 @@ const svg = container.querySelector("svg");
 const undoBtn = document.getElementById("undoBtn");
 
 
-
-
 /* ==================== 工具函數 ==================== */
 function stateIndexToBits(i) { return i.toString(2).padStart(bitCount,"0").split("").map(Number); }
 function bitsToStateIndex(bits) { return parseInt(bits.join(""),2); }
-
-
-
-
 function applyGateToIndex(stateIndex, gate){
   const b = stateIndexToBits(stateIndex);
   const nb = b.slice();
@@ -548,30 +502,55 @@ function applyGateToIndex(stateIndex, gate){
   }
   return bitsToStateIndex(nb);
 }
-
-
-
-
 /* ==================== 動態產生按鈕 ==================== */
 function renderGateButtons(){
   const box = document.querySelector(".gate-btns");
   box.innerHTML = "";
   const gates = bitCount === 3 ? [
-    {text:"X q0", g:{type:"X",target:0}},
-    {text:"X q1", g:{type:"X",target:1}},
-    {text:"X q2", g:{type:"X",target:2}},
-    {text:"1CNOT q0→q1", g:{type:"CNOT",control:0,target:1}},
-    {text:"1CNOT q1→q0", g:{type:"CNOT",control:1,target:0}},
-    {text:"1CNOT q0→q2", g:{type:"CNOT",control:0,target:2}},
-    {text:"1CNOT q2→q0", g:{type:"CNOT",control:2,target:0}},
-    {text:"1CNOT q1→q2", g:{type:"CNOT",control:1,target:2}},
-    {text:"1CNOT q2→q1", g:{type:"CNOT",control:2,target:1}},
-    {text:"0CNOT q0→q1", g:{type:"0CNOT",control:0,target:1}},
-    {text:"0CNOT q1→q0", g:{type:"0CNOT",control:1,target:0}},
-    {text:"0CNOT q0→q2", g:{type:"0CNOT",control:0,target:2}},
-    {text:"0CNOT q2→q0", g:{type:"0CNOT",control:2,target:0}},
-    {text:"0CNOT q1→q2", g:{type:"0CNOT",control:1,target:2}},
-    {text:"0CNOT q2→q1", g:{type:"0CNOT",control:2,target:1}}
+  // 3個 單量子比特 X
+  {text:"X q0", g:{type:"X",target:0}},
+  {text:"X q1", g:{type:"X",target:1}},
+  {text:"X q2", g:{type:"X",target:2}},
+
+
+  // 12 個 Toffoli Gates (依目標位元分組)
+  // Target: q2 (Controls: q0, q1)
+  {text:"TOF(q0,q1,   q2)", g:{type:"CCNOT", control1:0, c1Val:1, control2:1, c2Val:1, target:2}},
+  {text:"TOF(q0',q1', q2)", g:{type:"CCNOT", control1:0, c1Val:0, control2:1, c2Val:0, target:2}},
+  {text:"TOF(q0',q1,  q2)", g:{type:"CCNOT", control1:0, c1Val:0, control2:1, c2Val:1, target:2}},
+  {text:"TOF(q0,q1',  q2)", g:{type:"CCNOT", control1:0, c1Val:1, control2:1, c2Val:0, target:2}},
+
+
+  // Target: q1 (Controls: q0, q2)
+  {text:"TOF(q0,q2,   q1)", g:{type:"CCNOT", control1:0, c1Val:1, control2:2, c2Val:1, target:1}},
+  {text:"TOF(q0',q2', q1)", g:{type:"CCNOT", control1:0, c1Val:0, control2:2, c2Val:0, target:1}},
+  {text:"TOF(q0',q2,  q1)", g:{type:"CCNOT", control1:0, c1Val:0, control2:2, c2Val:1, target:1}},
+  {text:"TOF(q0,q2',  q1)", g:{type:"CCNOT", control1:0, c1Val:1, control2:2, c2Val:0, target:1}},
+
+
+  // Target: q0 (Controls: q1, q2)
+  {text:"TOF(q1,q2,   q0)", g:{type:"CCNOT", control1:1, c1Val:1, control2:2, c2Val:1, target:0}},
+  {text:"TOF(q1',q2', q0)", g:{type:"CCNOT", control1:1, c1Val:0, control2:2, c2Val:0, target:0}},
+  {text:"TOF(q1',q2,  q0)", g:{type:"CCNOT", control1:1, c1Val:0, control2:2, c2Val:1, target:0}},
+  {text:"TOF(q1,q2',  q0)", g:{type:"CCNOT", control1:1, c1Val:1, control2:2, c2Val:0, target:0}},
+
+
+  // 6 個普通 CNOT (1-Control)
+  {text:"CNOT q0→q1", g:{type:"CNOT",control:0,target:1}},
+  {text:"CNOT q1→q0", g:{type:"CNOT",control:1,target:0}},
+  {text:"CNOT q0→q2", g:{type:"CNOT",control:0,target:2}},
+  {text:"CNOT q2→q0", g:{type:"CNOT",control:2,target:0}},
+  {text:"CNOT q1→q2", g:{type:"CNOT",control:1,target:2}},
+  {text:"CNOT q2→q1", g:{type:"CNOT",control:2,target:1}},
+
+
+  // 6 個 0-Control CNOT
+  {text:"0CNOT q0→q1", g:{type:"0CNOT",control:0,target:1}},
+  {text:"0CNOT q1→q0", g:{type:"0CNOT",control:1,target:0}},
+  {text:"0CNOT q0→q2", g:{type:"0CNOT",control:0,target:2}},
+  {text:"0CNOT q2→q0", g:{type:"0CNOT",control:2,target:0}},
+  {text:"0CNOT q1→q2", g:{type:"0CNOT",control:1,target:2}},
+  {text:"0CNOT q2→q1", g:{type:"0CNOT",control:2,target:1}}
   ] : [
     {text:"X q0", g:{type:"X",target:0}},
     {text:"X q1", g:{type:"X",target:1}},
@@ -588,10 +567,6 @@ function renderGateButtons(){
     box.appendChild(b);
   });
 }
-
-
-
-
 /* ==================== 其餘函數 ==================== */
 function addGateToList(g){ circuit.push(g); renderGateList(); renderCircuitVisualization(); }
 function resetCircuit(){
@@ -652,10 +627,6 @@ function undoLastStep(){
   updateUndoButton();
 }
 function updateUndoButton(){ undoBtn.disabled = history.length === 0; }
-
-
-
-
 /* 電路視覺化 */
 function renderCircuitVisualization(){
   const c = document.getElementById("circuitVisualization"); c.innerHTML = "";
@@ -673,15 +644,7 @@ function renderCircuitVisualization(){
     else if(gate.type==="CCNOT") addCCNOTGate(gate, pos);
   });
 }
-
-
-
-
 function addXGate(t,p){ const l=document.getElementById(`circuit-line-${t}`); const g=document.createElement("div"); g.className="circuit-gate"; g.textContent="X"; g.style.left=p+"px"; l.appendChild(g); }
-
-
-
-
 /* === 新的連線函式 === */
 function addCNOTGate(c, t, p, hollow) {
     // 每一行高度 25px + gap 8px = 33px
@@ -693,10 +656,6 @@ function addCNOTGate(c, t, p, hollow) {
     // 12.5 是行高的一半，確保線條從圓心開始
     const topPos = (min * ROW_H) + 12.5;
     const height = (max - min) * ROW_H;
-
-
-
-
     // 畫垂直連接線
     const container = document.getElementById("circuitVisualization");
     const conn = document.createElement("div");
@@ -706,20 +665,12 @@ function addCNOTGate(c, t, p, hollow) {
     conn.style.height = (height-10) + "px";
     conn.style.transform = "none"; // 重要：取消 CSS 的置中偏移
     container.appendChild(conn);
-
-
-
-
     // 畫控制點 (圓點)
     const cl = document.getElementById(`circuit-line-${c}`);
     const cd = document.createElement("div");
     cd.className = hollow ? "circuit-control hollow" : "circuit-control";
     cd.style.left = p + "px";
     cl.appendChild(cd);
-
-
-
-
     // 畫目標點 (⊕)
     const tl = document.getElementById(`circuit-line-${t}`);
     const td = document.createElement("div");
@@ -727,26 +678,14 @@ function addCNOTGate(c, t, p, hollow) {
     td.style.left = (p - 2.2) + "px";
     tl.appendChild(td);
 }
-
-
-
-
 function addCCNOTGate(g, p) {
     // 每一行高度 25px + gap 8px = 33px
     const ROW_H = 33;
     const lines = [g.control1, g.control2, g.target].sort((a, b) => a - b);
     const min = lines[0];
     const max = lines[2]; // 取最大和最小的行號
-
-
-
-
     const topPos = (min * ROW_H) + 12.5;
     const height = (max - min) * ROW_H;
-
-
-
-
     // 畫垂直連接線 (貫穿這三點)
     const container = document.getElementById("circuitVisualization");
     const conn = document.createElement("div");
@@ -756,30 +695,18 @@ function addCCNOTGate(g, p) {
     conn.style.height = (height-10) + "px";
     conn.style.transform = "none"; // 重要：取消 CSS 的置中偏移
     container.appendChild(conn);
-
-
-
-
     // 畫控制點 1
     const c1l = document.getElementById(`circuit-line-${g.control1}`);
     const c1d = document.createElement("div");
     c1d.className = g.c1Val === 0 ? "circuit-control hollow" : "circuit-control";
     c1d.style.left = p + "px";
     c1l.appendChild(c1d);
-
-
-
-
     // 畫控制點 2
     const c2l = document.getElementById(`circuit-line-${g.control2}`);
     const c2d = document.createElement("div");
     c2d.className = g.c2Val === 0 ? "circuit-control hollow" : "circuit-control";
     c2d.style.left = p + "px";
     c2l.appendChild(c2d);
-
-
-
-
     // 畫目標點 (⊕)
     const tl = document.getElementById(`circuit-line-${g.target}`);
     const td = document.createElement("div");
@@ -787,10 +714,6 @@ function addCCNOTGate(g, p) {
     td.style.left = (p - 2.2) + "px";
     tl.appendChild(td);
 }
-
-
-
-
 /* 核心：套用閘門 + 魚動畫 */
 function applyGateAndAnimate(gate){
   saveStateToHistory();
@@ -811,15 +734,7 @@ function applyGateAndAnimate(gate){
   steps++; stepDisplay.textContent = `步數：${steps}`;
   updateUndoButton();
 }
-
-
-
-
 function getCurrentLevel(){ return bitLevels[bitCount][currentLevel]; }
-
-
-
-
 function loadLevel(idx){
   document.getElementById("levelNumber").textContent = `題目：${idx+1}`;
   container.querySelectorAll(".planet").forEach(p=>p.remove());
@@ -827,12 +742,7 @@ function loadLevel(idx){
   const level = getCurrentLevel();
   const is3bit = bitCount===3;
   const planetSize = is3bit ? 90 : 140;
- 
   container.style.width = container.style.height = is3bit ? "600px" : "420px";
-
-
-
-
   level.planets.forEach(p=>{
     const div = document.createElement("div");
     div.className = "planet"; div.id = p.id;
@@ -845,15 +755,7 @@ function loadLevel(idx){
     container.appendChild(div);
     planets[p.id] = div;
   });
-
-
-
-
   const offset = is3bit ? 45 : 70;
-
-
-
-
   level.lines.forEach(([id,p1,p2])=>{
     const line = document.createElementNS("http://www.w3.org/2000/svg","line");
     const pl1 = level.planets.find(x=>x.id===p1);
@@ -866,19 +768,11 @@ function loadLevel(idx){
     line.addEventListener("mouseleave",()=>{line.style.stroke="#555"; line.style.strokeWidth="4";});
     line.addEventListener("click",()=>onLineClick(p1,p2));
   });
-
-
-
-
   princes = JSON.parse(JSON.stringify(level.princes));
   placePrincesByFixedArrangement(idx);
   steps = 0; stepDisplay.textContent = "步數：0";
   startTimer(); renderCircuitVisualization(); history = []; updateUndoButton();
 }
-
-
-
-
 function placePrincesByFixedArrangement(idx){
   Object.values(planets).forEach(p => p.querySelectorAll(".person").forEach(img => img.remove()));
   if(bitCount===3){
@@ -912,10 +806,6 @@ function placePrincesByFixedArrangement(idx){
     });
   }
 }
-
-
-
-
 function checkSuccess(){
   const ok = princes.every(p=>{
     const img = planets[p.target].querySelector(".person");
@@ -923,10 +813,6 @@ function checkSuccess(){
   });
   if(ok){ clearInterval(timerInterval); showPopup(steps, Math.floor((Date.now()-startTime)/1000)); }
 }
-
-
-
-
 function startTimer(){
   clearInterval(timerInterval);
   startTime = Date.now();
@@ -934,24 +820,12 @@ function startTimer(){
 }
 function showPopup(s,t){ document.querySelector("#successPopup p").innerHTML = `哇！你走了 ${s} 步，花了 ${t} 秒，讓每隻貓都吃到對應的魚耶~`; document.getElementById("successPopup").style.display = "flex"; }
 function softResetFish(){ steps=0; stepDisplay.textContent="步數：0"; placePrincesByFixedArrangement(currentLevel); startTimer(); history=[]; updateUndoButton(); }
-
-
-
-
 function onLineClick(p1, p2) {
   const key = [p1, p2].sort().join(",");
-
-
-
-
   if (bitCount === 1) {
     applyGateAndAnimate({ type: "X", target: 0 });
     return;
   }
-
-
-
-
   if (bitCount === 2) {
     const map2 = {
       "planet1,planet2": { type: "0CNOT", control: 0, target: 1 },
@@ -962,10 +836,6 @@ function onLineClick(p1, p2) {
     if (map2[key]) applyGateAndAnimate(map2[key]);
     return;
   }
-
-
-
-
   if (bitCount === 3) {
     const map3 = {
       // q0 (LSB) 改變
@@ -973,37 +843,21 @@ function onLineClick(p1, p2) {
       "planet2,planet3": { type: "CCNOT", control1: 0, c1Val: 0, control2: 1, c2Val: 1, target: 2 },
       "planet4,planet5": { type: "CCNOT", control1: 0, c1Val: 1, control2: 1, c2Val: 0, target: 2 },
       "planet6,planet7": { type: "CCNOT", control1: 0, c1Val: 1, control2: 1, c2Val: 1, target: 2 },
-
-
-
-
       // q1 (Middle) 改變
       "planet0,planet2": { type: "CCNOT", control1: 0, c1Val: 0, control2: 2, c2Val: 0, target: 1 },
       "planet1,planet3": { type: "CCNOT", control1: 0, c1Val: 0, control2: 2, c2Val: 1, target: 1 },
       "planet4,planet6": { type: "CCNOT", control1: 0, c1Val: 1, control2: 2, c2Val: 0, target: 1 },
       "planet5,planet7": { type: "CCNOT", control1: 0, c1Val: 1, control2: 2, c2Val: 1, target: 1 },
-
-
-
-
       // q2 (MSB) 改變
       "planet0,planet4": { type: "CCNOT", control1: 1, c1Val: 0, control2: 2, c2Val: 0, target: 0 },
       "planet1,planet5": { type: "CCNOT", control1: 1, c1Val: 0, control2: 2, c2Val: 1, target: 0 },
       "planet2,planet6": { type: "CCNOT", control1: 1, c1Val: 1, control2: 2, c2Val: 0, target: 0 },
       "planet3,planet7": { type: "CCNOT", control1: 1, c1Val: 1, control2: 2, c2Val: 1, target: 0 }
     };
-
-
-
-
     if (map3[key]) applyGateAndAnimate(map3[key]);
     return;
   }
 }
-
-
-
-
 document.getElementById("closePopup").onclick = ()=>{ document.getElementById("successPopup").style.display="none"; resetCircuit(); };
 document.getElementById("resetBtn").onclick = ()=>{ resetCircuit(); };
 document.getElementById("bitSelector").onchange = (e)=>{
@@ -1028,23 +882,17 @@ function transitionLevel(next,dir){
 }
 document.getElementById("prevBtn").onclick = ()=>{ const L=bitLevels[bitCount].length; transitionLevel((currentLevel-1+L)%L,"left"); resetCircuit(); };
 document.getElementById("nextBtn").onclick = ()=>{ const L=bitLevels[bitCount].length; transitionLevel((currentLevel+1)%L,"right"); resetCircuit(); };
-
-
-
-
 const toggleBtn = document.getElementById('toggleCircuitBtn');
 let hidden = false;
 toggleBtn.addEventListener('click', ()=>{ hidden=!hidden; document.body.classList.toggle('hide-circuit-mode',hidden); });
 document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='h') toggleBtn.click(); });
-
-
-
-
 renderGateButtons();
 loadLevel(currentLevel);
 </script>
 </body>
 </html>
+
+
 
 
 
