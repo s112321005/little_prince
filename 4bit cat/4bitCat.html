@@ -719,7 +719,7 @@ function restoreFishPositions(fishData){
       
       // 復原 CSS 樣式
       if(data.isGhost) {
-         img.style.opacity = "0.55";
+         img.style.opacity = "1"; // 修改：改回 1
          img.style.filter = "grayscale(40%) sepia(20%)";
       } else {
          img.style.opacity = "1";
@@ -995,7 +995,7 @@ function placePrincesByFixedArrangement(idx){
          // 如果這條魚的目標是 8-15 (右邊正方體)，它就是虛擬魚，永遠保持淡化
          if(fishIdx >= 8) {
              img.classList.add("ghost-fish");
-             img.style.opacity = "0.55";
+             img.style.opacity = "1"; // 修改：改回 1 (原本是 0.55)
              img.style.filter = "grayscale(40%) sepia(20%)";
          } else {
              // 實體魚，保持原樣
