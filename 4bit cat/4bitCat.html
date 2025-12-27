@@ -3,35 +3,421 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>貓貓星球 - 量子超立方體版 (q0=MSB)</title>
+<title>貓貓星球 - 量子超立方體版</title>
 <style>
-     body {
-        margin: 0;
-        padding: 0;
-        
-        /* 1. 排版設定 */
+    /* ==================== 大地色系變數 ==================== */
+    :root {
+        --earth-brown: #8B7355;
+        --earth-light: #D6CC98;
+        --earth-dark: #5C4D3A;
+        --earth-sand: #E8E1C6;
+        --earth-clay: #B39C7D;
+        --earth-tan: #C4B595;
+        --earth-cream: #F5F1E0;
+        --earth-coffee: #6F4E37;
+    }
+
+    /* ==================== 登入頁面樣式 ==================== */
+    #loginPage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--earth-dark) 0%, var(--earth-brown) 50%, var(--earth-light) 100%);
         display: flex;
         flex-direction: column;
-        
-        /* 關鍵：靠左對齊，這樣往右滑才看得到內容 */
-        align-items: flex-start; 
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        transition: opacity 0.5s ease;
+    }
+    
+    .login-container {
+        background: var(--earth-cream);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        border: 3px solid var(--earth-coffee);
+    }
+    
+    .login-title {
+        color: var(--earth-coffee);
+        margin-bottom: 30px;
+        font-size: 2rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .login-input {
+        width: 100%;
+        padding: 12px 15px;
+        margin: 10px 0;
+        border: 2px solid var(--earth-tan);
+        border-radius: 10px;
+        font-size: 16px;
+        background: white;
+        color: var(--earth-dark);
+        box-sizing: border-box;
+        transition: all 0.3s;
+    }
+    
+    .login-input:focus {
+        outline: none;
+        border-color: var(--earth-brown);
+        box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.2);
+    }
+    
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        margin-top: 15px;
+        background: var(--earth-brown);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .login-btn:hover {
+        background: var(--earth-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .guest-btn {
+        background: var(--earth-tan);
+        color: var(--earth-dark);
+    }
+    
+    .guest-btn:hover {
+        background: var(--earth-clay);
+    }
+    
+    .toggle-form-btn {
+        background: transparent;
+        color: var(--earth-brown);
+        border: 2px solid var(--earth-brown);
+        margin-top: 10px;
+    }
+    
+    .toggle-form-btn:hover {
+        background: rgba(139, 115, 85, 0.1);
+    }
+    
+    .form-message {
+        margin: 15px 0;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        display: none;
+    }
+    
+    .form-message.success {
+        background: rgba(76, 175, 80, 0.1);
+        color: #2e7d32;
+        border: 1px solid #4caf50;
+        display: block;
+    }
+    
+    .form-message.error {
+        background: rgba(244, 67, 54, 0.1);
+        color: #d32f2f;
+        border: 1px solid #f44336;
+        display: block;
+    }
+
+    /* ==================== 登出按鈕樣式 ==================== */
+    #logoutBtn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: rgba(139, 115, 85, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 22px;
+        cursor: pointer;
+        z-index: 10000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        display: none; /* 預設隱藏，登入後顯示 */
+    }
+    
+    #logoutBtn:hover {
+        background: var(--earth-dark);
+        transform: scale(1.1);
+    }
+    
+    #logoutBtn::before {
+        content: "🚪";
+    }
+
+    /* ==================== 排行榜樣式 ==================== */
+    #leaderboardBtn {
+        position: fixed;
+        top: 20px;
+        right: 90px;
+        width: 50px;
+        height: 50px;
+        background: rgba(139, 115, 85, 0.9);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 22px;
+        cursor: pointer;
+        z-index: 10000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #leaderboardBtn:hover {
+        background: var(--earth-dark);
+        transform: scale(1.1);
+    }
+    
+    #leaderboardBtn::before {
+        content: "🏆";
+    }
+    
+    #leaderboardPage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 20000;
+    }
+    
+    .leaderboard-container {
+        background: var(--earth-cream);
+        padding: 30px;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 800px; /* 增加寬度 */
+        max-height: 85vh; /* 增加高度 */
+        overflow-y: auto;
+        border: 3px solid var(--earth-coffee);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
+    .leaderboard-title {
+        color: var(--earth-coffee);
+        text-align: center;
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+        border-bottom: 2px solid var(--earth-tan);
+        padding-bottom: 10px;
+    }
+    
+    /* 排行榜控制區塊 */
+    .leaderboard-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .leaderboard-tabs {
+        display: flex;
+        flex: 1;
+        border-bottom: 2px solid var(--earth-tan);
+    }
+    
+    .leaderboard-tab {
+        flex: 1;
+        padding: 12px;
+        background: var(--earth-sand);
+        border: none;
+        border-right: 1px solid var(--earth-tan);
+        cursor: pointer;
+        font-size: 16px;
+        color: var(--earth-dark);
+        transition: all 0.3s;
+    }
+    
+    .leaderboard-tab:last-child {
+        border-right: none;
+    }
+    
+    .leaderboard-tab.active {
+        background: var(--earth-brown);
+        color: white;
+        font-weight: bold;
+    }
+    
+    .leaderboard-tab:hover:not(.active) {
+        background: var(--earth-clay);
+    }
+    
+    /* 排序選擇器 */
+    .sort-selector {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .sort-btn {
+        padding: 8px 15px;
+        background: var(--earth-sand);
+        border: 1px solid var(--earth-tan);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--earth-dark);
+        transition: all 0.3s;
+        min-width: 100px;
+    }
+    
+    .sort-btn.active {
+        background: var(--earth-brown);
+        color: white;
+        border-color: var(--earth-brown);
+    }
+    
+    .sort-btn:hover:not(.active) {
+        background: var(--earth-clay);
+    }
+    
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .leaderboard-table th {
+        background: var(--earth-brown);
+        color: white;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 3px solid var(--earth-coffee);
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .leaderboard-table th:hover {
+        background: var(--earth-dark);
+    }
+    
+    .leaderboard-table th.sortable::after {
+        content: " ↕";
+        font-size: 12px;
+        opacity: 0.7;
+    }
+    
+    .leaderboard-table th.sorted-asc::after {
+        content: " ↑";
+        opacity: 1;
+    }
+    
+    .leaderboard-table th.sorted-desc::after {
+        content: " ↓";
+        opacity: 1;
+    }
+    
+    .leaderboard-table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--earth-tan);
+        color: var(--earth-dark);
+    }
+    
+    .leaderboard-table tr:nth-child(even) {
+        background: var(--earth-sand);
+    }
+    
+    .leaderboard-table tr:hover {
+        background: var(--earth-tan);
+    }
+    
+    .leaderboard-rank {
+        font-weight: bold;
+        color: var(--earth-coffee);
+        width: 60px; /* 增加寬度 */
+        text-align: center;
+    }
+    
+    .leaderboard-name {
+        font-weight: bold;
+        min-width: 120px; /* 增加寬度 */
+    }
+    
+    .leaderboard-steps, .leaderboard-time {
+        text-align: center;
+        font-family: monospace;
+        min-width: 100px; /* 增加寬度 */
+    }
+    
+    .close-leaderboard {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: var(--earth-dark);
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .close-leaderboard:hover {
+        background: var(--earth-tan);
+    }
+    
+    .my-rank {
+        background: rgba(214, 204, 152, 0.3) !important;
+        font-weight: bold;
+        border-left: 4px solid var(--earth-coffee);
+    }
+    
+    /* ==================== 主遊戲介面 ==================== */
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: flex-start;
-        
         padding-top: 20px;
         padding-bottom: 120px;
-        
-        /* 2. 寬度與滾動設定 */
-        /* 強制網頁至少有 1100px 寬，這樣只要稍微放大或視窗較小，左右滾輪就會馬上出現 */
-        min-width: 1100px; 
-        min-height: 100vh;
-        
-        background: #d6cc98;
+        min-width: 1100px;
+        min-height: 150vh; /* 增加頁面高度 */
+        background: var(--earth-light);
         font-family: sans-serif;
-        
-        /* 開啟滾動條 */
         overflow: auto;
-        
         transition: all 0.4s ease;
+    }
+
+    /* 底部空白區域，讓頁面可以捲動 */
+    .page-spacer {
+        height: 800px; /* 增加底部空白 */
+        width: 100%;
+        opacity: 0;
+        pointer-events: none;
     }
 
     #gameWrapper {
@@ -42,10 +428,10 @@
         max-width: 950px;
         position: relative;
         z-index: 50;
-        
-        /* 讓它在有空間時置中，沒空間時保持左邊距 */
-        margin: 0 auto; 
+        margin: 0 auto;
+        margin-bottom: 50px; /* 增加底部間距 */
     }
+    
     #container {
         position: relative;
         width: 420px;
@@ -54,15 +440,16 @@
         margin: 0 auto;
         transition: all 0.4s ease;
     }
+    
     /* 美化下拉選單 */
     #bitSelector {
         width: 100%;
         padding: 8px 12px;
-        border: 2px solid #e2e8f0;
+        border: 2px solid var(--earth-tan);
         border-radius: 10px;
         background: white;
         font-size: 14px;
-        color: #1e293b;
+        color: var(--earth-dark);
         cursor: pointer;
         transition: all 0.3s ease;
         appearance: none;
@@ -71,15 +458,18 @@
         background-position: right 12px center;
         background-size: 12px;
     }
+    
     #bitSelector:hover {
-        border-color: #7a654f;
-        box-shadow: 0 2px 8px rgba(122, 101, 79, 0.1);
+        border-color: var(--earth-brown);
+        box-shadow: 0 2px 8px rgba(139, 115, 85, 0.1);
     }
+    
     #bitSelector:focus {
         outline: none;
-        border-color: #7a654f;
-        box-shadow: 0 0 0 3px rgba(122, 101, 79, 0.1);
+        border-color: var(--earth-brown);
+        box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
     }
+    
     .planet {
         position: absolute;
         width: 140px;
@@ -93,19 +483,22 @@
         box-shadow: 0 4px 10px rgba(0,0,0,.2);
         transition: all 0.4s ease;
         z-index: 10;
-        background: #fff; 
+        background: #fff;
     }
+    
     .planet img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         border-radius: 50%;
     }
+    
     /* 4bit 第二個立方體的特殊樣式：刷淡 */
     .planet.faded {
         border-color: rgba(255, 255, 255, 0.6);
         box-shadow: 0 2px 5px rgba(0,0,0,.1);
     }
+    
     .planet.faded img, .planet.faded .person {
         opacity: 1;
         filter: grayscale(40%) sepia(20%);
@@ -125,6 +518,7 @@
         pointer-events: none;
         white-space: nowrap;
     }
+    
     svg {
         position: absolute;
         top: 0;
@@ -135,24 +529,28 @@
         pointer-events: auto;
         overflow: visible;
     }
+    
     line {
-        stroke: #555;
+        stroke: var(--earth-dark);
         stroke-width: 5;
         cursor: pointer;
         transition: stroke .3s;
     }
+    
     line:hover {
-        stroke: #000;
+        stroke: var(--earth-coffee);
     }
+    
     /* 4bit 連接兩個立方體的線條樣式 */
     line.hyper-line {
-        stroke: #999;
+        stroke: var(--earth-clay);
         stroke-dasharray: 6, 6;
         opacity: 0.5;
         stroke-width: 3;
     }
+    
     line.hyper-line:hover {
-        stroke: #333;
+        stroke: var(--earth-coffee);
         opacity: 1;
         stroke-width: 6;
         stroke-dasharray: none;
@@ -171,10 +569,11 @@
         transition: all 0.4s ease;
         z-index: 20;
     }
+    
     .left-panel {
         position: absolute;
         left: 10px;
-        top: 3vh;
+        top: 80px; /* 調整位置避免和登出按鈕重疊 */
         width: 220px;
         background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(10px);
@@ -182,27 +581,76 @@
         padding: 14px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         font-size: 14px;
-        color: #1e293b;
+        color: var(--earth-dark);
         z-index: 100;
-        max-height: 85vh;
+        max-height: 80vh;
         overflow-y: auto;
         transition: all 0.4s ease;
     }
-    .left-panel h3 { margin: 0 0 10px; font-size: 15px; text-align: center; color: #1e293b; }
-    #info { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
-    #levelNumber { font-size: 1.2rem; font-weight: bold; color: #333; }
-    #steps { font-size: 1.1rem; font-weight: bold; color: #333; }
-    #timer { font-size: 1rem; color: #444; }
-    #buttons { display: flex; justify-content: center; gap: 10px; margin-top: 15px; width: 100%; }
-    #resetBtn { padding: 8px 16px; background: #7a654f; color: #fff; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
-    #resetBtn:hover { background: #5c4d3a; }
+    
+    .left-panel h3 { 
+        margin: 0 0 10px; 
+        font-size: 15px; 
+        text-align: center; 
+        color: var(--earth-dark); 
+    }
+    
+    #info { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        gap: 8px; 
+        margin-bottom: 15px; 
+        padding-bottom: 15px; 
+        border-bottom: 1px solid var(--earth-tan); 
+    }
+    
+    #levelNumber { 
+        font-size: 1.2rem; 
+        font-weight: bold; 
+        color: var(--earth-dark); 
+    }
+    
+    #steps { 
+        font-size: 1.1rem; 
+        font-weight: bold; 
+        color: var(--earth-dark); 
+    }
+    
+    #timer { 
+        font-size: 1rem; 
+        color: var(--earth-dark); 
+    }
+    
+    #buttons { 
+        display: flex; 
+        justify-content: center; 
+        gap: 10px; 
+        margin-top: 15px; 
+        width: 100%; 
+    }
+    
+    #resetBtn { 
+        padding: 8px 16px; 
+        background: var(--earth-brown); 
+        color: #fff; 
+        border: none; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        cursor: pointer; 
+    }
+    
+    #resetBtn:hover { 
+        background: var(--earth-dark); 
+    }
+    
     #prevBtn, #nextBtn {
         width: 50px;
         height: 50px;
         border-radius: 50%;
         border: none;
-        background: #f1f1f1b1;
-        color: #7a654f;
+        background: rgba(241, 241, 241, 0.7);
+        color: var(--earth-brown);
         font-size: 1.5rem;
         cursor: pointer;
         display: flex;
@@ -210,9 +658,27 @@
         justify-content: center;
         transition: background .3s;
     }
-    #prevBtn::after { content: "◀"; position: relative; top: -1px; right: 3px; font-size: 1.5rem; }
-    #nextBtn::after { content: "▶"; position: relative; top: -1px; left: 3px; font-size: 1.5rem; }
-    #prevBtn:hover, #nextBtn:hover { background-color: #5c4d3a; color: white; }
+    
+    #prevBtn::after { 
+        content: "◀"; 
+        position: relative; 
+        top: -1px; 
+        right: 3px; 
+        font-size: 1.5rem; 
+    }
+    
+    #nextBtn::after { 
+        content: "▶"; 
+        position: relative; 
+        top: -1px; 
+        left: 3px; 
+        font-size: 1.5rem; 
+    }
+    
+    #prevBtn:hover, #nextBtn:hover { 
+        background-color: var(--earth-dark); 
+        color: white; 
+    }
     
     @media (max-width: 768px) {
         #container { width: 380px; height: 380px; }
@@ -220,62 +686,408 @@
         .person { width: 80px; height: 80px; }
         body { padding-bottom: 200px; }
         .left-panel { top: auto; bottom: 20px; left: 20px; max-height: 40vh; }
+        #logoutBtn { top: 10px; left: 10px; }
+        #leaderboardBtn { top: 10px; right: 70px; }
     }
     
     .slide-out-left { animation: slideOutLeft .6s forwards; }
     .slide-in-right { animation: slideInRight .6s forwards; }
     .slide-out-right { animation: slideOutRight .6s forwards; }
     .slide-in-left { animation: slideInLeft .6s forwards; }
+    
     @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
     @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     
-    .popup { position: fixed; inset: 0; background: rgba(0,0,0,.4); display: none; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn .3s ease; }
-    .popup-content { background: #fff; border-radius: 20px; padding: 30px 40px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,.3); animation: popUp .4s ease; max-width: 90%; }
-    .popup-content h2 { margin: 8px 0 10px; }
-    .popup-content button { background: #ffb60b; color: #fff; border: none; border-radius: 12px; padding: 10px 20px; cursor: pointer; font-size: 16px; transition: background .2s; }
-    .popup-content button:hover { background: #ff750b; }
+    .popup { 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0,0,0,.4); 
+        display: none; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 1000; 
+        animation: fadeIn .3s ease; 
+    }
+    
+    .popup-content { 
+        background: var(--earth-cream); 
+        border-radius: 20px; 
+        padding: 30px 40px; 
+        text-align: center; 
+        box-shadow: 0 5px 20px rgba(0,0,0,.3); 
+        animation: popUp .4s ease; 
+        max-width: 90%; 
+        border: 3px solid var(--earth-coffee);
+    }
+    
+    .popup-content h2 { 
+        margin: 8px 0 10px; 
+        color: var(--earth-coffee);
+    }
+    
+    .popup-content p {
+        color: var(--earth-dark);
+    }
+    
+    .popup-content button { 
+        background: var(--earth-brown); 
+        color: #fff; 
+        border: none; 
+        border-radius: 12px; 
+        padding: 10px 20px; 
+        cursor: pointer; 
+        font-size: 16px; 
+        transition: background .2s; 
+    }
+    
+    .popup-content button:hover { 
+        background: var(--earth-dark); 
+    }
+    
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popUp { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     
-    .gate-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid #e2e8f0; }
-    .gate-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-    .gate-btn { flex: 1 1 45%; padding: 6px 8px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 12px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08); text-align: center; }
-    .gate-btn:hover { background: #f8fafc; box-shadow: 0 3px 8px rgba(0,0,0,.1); }
-    .gate-list { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; max-height: 80px; overflow-y: auto; }
-    .gate-badge { display: flex; align-items: center; gap: 5px; padding: 3px 7px; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-    .gate-badge .remove { width: 15px; height: 15px; background: #ef4444; color: #fff; border: none; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .gate-badge .remove:hover { background: #dc2626; }
-    .reset-circuit-btn { width: 100%; margin-top: 8px; padding: 6px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 12px; cursor: pointer; }
-    .reset-circuit-btn:hover { background: #f8fafc; }
-    #undoBtn { padding: 8px 16px; background: #7a654f; color: #fff; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 10px; width: 100%; }
-    #undoBtn:hover { background: #5c4d3a; }
-    #undoBtn:disabled { background: #cccccc; cursor: not-allowed; }
+    .gate-section { 
+        margin-top: 15px; 
+        padding-top: 15px; 
+        border-top: 1px solid var(--earth-tan); 
+    }
     
-    .circuit-panel { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 1000px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 14px; color: #1e293b; z-index: 100; transition: all 0.4s ease; }
-    .circuit-panel h3 { margin: 0 0 10px; font-size: 15px; color: #1e293b; text-align: center; }
-    .circuit-visualization { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; position: relative; }
-    .circuit-line { display: flex; align-items: center; height: 25px; position: relative; z-index: 10;}
-    .circuit-line-label { width: 30px; text-align: center; font-weight: bold; font-size: 12px; }
-    .circuit-line-path { flex: 1; height: 2px; background: #111111; position: relative; margin: 0 10px; }
-    .circuit-gate { position: absolute; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; border-radius: 4px; background: #7a654f; color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; }
-    .circuit-control { position: absolute; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: #111111; border: 2px solid #000000; }
-    .circuit-control.hollow { background: white !important; border: 2px solid #000000 !important; }
-    .circuit-target { position: absolute; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; border-radius: 50%; color: #111111; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
-    .circuit-target::after { content: "⊕"; }
-    .circuit-connector { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 2px; height: 100%; background: #111111; z-index: 1;}
-    .hide-circuit-mode .left-panel, .hide-circuit-mode .circuit-panel { transform: translateX(-120%) !important; opacity: 0; pointer-events: none; }
-    .hide-circuit-mode .circuit-panel { transform: translateY(120%) !important; }
-    .toggle-circuit-btn { position: fixed; top: 20px; right: 20px; width: 50px; height: 50px; background: rgba(122, 101, 79, 0.9); color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); backdrop-filter: blur(8px); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
-    .toggle-circuit-btn:hover { background: #5c4d3a; transform: scale(1.1); }
-    .toggle-circuit-btn::before { content: "⚡"; }
-    .hide-circuit-mode .toggle-circuit-btn::before { content: "👁️"; }
+    .gate-btns { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 6px; 
+        margin-bottom: 10px; 
+    }
+    
+    .gate-btn { 
+        flex: 1 1 45%; 
+        padding: 6px 8px; 
+        background: white; 
+        border: 1px solid var(--earth-tan); 
+        border-radius: 10px; 
+        font-size: 12px; 
+        cursor: pointer; 
+        box-shadow: 0 1px 3px rgba(0,0,0,.08); 
+        text-align: center; 
+        color: var(--earth-dark);
+    }
+    
+    .gate-btn:hover { 
+        background: var(--earth-sand); 
+        box-shadow: 0 3px 8px rgba(0,0,0,.1); 
+    }
+    
+    .gate-list { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 5px; 
+        margin: 8px 0; 
+        max-height: 80px; 
+        overflow-y: auto; 
+    }
+    
+    .gate-badge { 
+        display: flex; 
+        align-items: center; 
+        gap: 5px; 
+        padding: 3px 7px; 
+        background: white; 
+        border: 1px solid var(--earth-tan); 
+        border-radius: 8px; 
+        font-family: ui-monospace, monospace; 
+        font-size: 11px; 
+        box-shadow: 0 1px 2px rgba(0,0,0,.06); 
+        color: var(--earth-dark);
+    }
+    
+    .gate-badge .remove { 
+        width: 15px; 
+        height: 15px; 
+        background: #ef4444; 
+        color: #fff; 
+        border: none; 
+        border-radius: 50%; 
+        font-size: 10px; 
+        cursor: pointer; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    
+    .gate-badge .remove:hover { 
+        background: #dc2626; 
+    }
+    
+    .reset-circuit-btn { 
+        width: 100%; 
+        margin-top: 8px; 
+        padding: 6px; 
+        background: white; 
+        border: 1px solid var(--earth-tan); 
+        border-radius: 10px; 
+        font-size: 12px; 
+        cursor: pointer; 
+        color: var(--earth-dark);
+    }
+    
+    .reset-circuit-btn:hover { 
+        background: var(--earth-sand); 
+    }
+    
+    #undoBtn { 
+        padding: 8px 16px; 
+        background: var(--earth-brown); 
+        color: #fff; 
+        border: none; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        cursor: pointer; 
+        margin-top: 10px; 
+        width: 100%; 
+    }
+    
+    #undoBtn:hover { 
+        background: var(--earth-dark); 
+    }
+    
+    #undoBtn:disabled { 
+        background: var(--earth-clay); 
+        cursor: not-allowed; 
+    }
+    
+    .circuit-panel { 
+        position: fixed; 
+        bottom: 10px; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        width: 80%; 
+        max-width: 1000px; 
+        background: rgba(255, 255, 255, 0.95); 
+        backdrop-filter: blur(10px); 
+        border-radius: 16px; 
+        padding: 14px; 
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); 
+        font-size: 14px; 
+        color: var(--earth-dark); 
+        z-index: 100; 
+        transition: all 0.4s ease; 
+        border: 1px solid var(--earth-tan);
+    }
+    
+    .circuit-panel h3 { 
+        margin: 0 0 10px; 
+        font-size: 15px; 
+        color: var(--earth-dark); 
+        text-align: center; 
+    }
+    
+    .circuit-visualization { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 8px; 
+        margin-top: 10px; 
+        position: relative; 
+    }
+    
+    .circuit-line { 
+        display: flex; 
+        align-items: center; 
+        height: 25px; 
+        position: relative; 
+        z-index: 10;
+    }
+    
+    .circuit-line-label { 
+        width: 30px; 
+        text-align: center; 
+        font-weight: bold; 
+        font-size: 12px; 
+        color: var(--earth-dark);
+    }
+    
+    .circuit-line-path { 
+        flex: 1; 
+        height: 2px; 
+        background: var(--earth-dark); 
+        position: relative; 
+        margin: 0 10px; 
+    }
+    
+    .circuit-gate { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        width: 18px; 
+        height: 18px; 
+        border-radius: 4px; 
+        background: var(--earth-brown); 
+        color: white; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 9px; 
+        font-weight: bold; 
+    }
+    
+    .circuit-control { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        width: 10px; 
+        height: 10px; 
+        border-radius: 50%; 
+        background: var(--earth-dark); 
+        border: 2px solid var(--earth-dark); 
+    }
+    
+    .circuit-control.hollow { 
+        background: white !important; 
+        border: 2px solid var(--earth-dark) !important; 
+    }
+    
+    .circuit-target { 
+        position: absolute; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        width: 18px; 
+        height: 18px; 
+        border-radius: 50%; 
+        color: var(--earth-dark); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 20px; 
+        font-weight: bold; 
+    }
+    
+    .circuit-target::after { 
+        content: "⊕"; 
+    }
+    
+    .circuit-connector { 
+        position: absolute; 
+        left: 0; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        width: 2px; 
+        height: 100%; 
+        background: var(--earth-dark); 
+        z-index: 1;
+    }
+    
+    .hide-circuit-mode .left-panel, .hide-circuit-mode .circuit-panel { 
+        transform: translateX(-120%) !important; 
+        opacity: 0; 
+        pointer-events: none; 
+    }
+    
+    .hide-circuit-mode .circuit-panel { 
+        transform: translateY(120%) !important; 
+    }
+    
+    .toggle-circuit-btn { 
+        position: fixed; 
+        top: 20px; 
+        right: 20px; 
+        width: 50px; 
+        height: 50px; 
+        background: rgba(139, 115, 85, 0.9); 
+        color: white; 
+        border: none; 
+        border-radius: 50%; 
+        font-size: 24px; 
+        cursor: pointer; 
+        z-index: 10000; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+        backdrop-filter: blur(8px); 
+        transition: all 0.3s ease; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    
+    .toggle-circuit-btn:hover { 
+        background: var(--earth-dark); 
+        transform: scale(1.1); 
+    }
+    
+    .toggle-circuit-btn::before { 
+        content: "⚡"; 
+    }
+    
+    .hide-circuit-mode .toggle-circuit-btn::before { 
+        content: "👁️"; 
+    }
 </style>
 </head>
 <body>
+<!-- 登入頁面 -->
+<div id="loginPage">
+    <div class="login-container">
+        <h1 class="login-title">🐱 貓貓星球 🐟</h1>
+        <p style="color: var(--earth-dark); margin-bottom: 25px;">歡迎來到量子貓貓遊戲！請登入開始遊戲</p>
+        
+        <!-- 登入表單 -->
+        <div id="loginForm">
+            <input type="text" id="usernameInput" class="login-input" placeholder="使用者名稱" maxlength="50">
+            <input type="password" id="passwordInput" class="login-input" placeholder="密碼">
+            <div id="loginMessage" class="form-message"></div>
+            <button id="loginBtn" class="login-btn">登入</button>
+            <button id="guestLoginBtn" class="login-btn guest-btn">訪客遊玩</button>
+            <button id="showRegisterBtn" class="login-btn toggle-form-btn">註冊新帳號</button>
+        </div>
+        
+        <!-- 註冊表單 -->
+        <div id="registerForm" style="display: none;">
+            <input type="text" id="regUsername" class="login-input" placeholder="使用者名稱 (1-50字)" maxlength="50">
+            <input type="password" id="regPassword" class="login-input" placeholder="密碼 (至少6字)">
+            <input type="password" id="regConfirmPassword" class="login-input" placeholder="確認密碼">
+            <input type="email" id="regEmail" class="login-input" placeholder="電子郵件 (選填)">
+            <div id="registerMessage" class="form-message"></div>
+            <button id="registerBtn" class="login-btn">註冊</button>
+            <button id="showLoginBtn" class="login-btn toggle-form-btn">返回登入</button>
+        </div>
+    </div>
+</div>
+
+<!-- 登出按鈕 -->
+<button id="logoutBtn" title="登出 (或按 O 鍵)"></button>
+
+<!-- 排行榜按鈕 -->
+<button id="leaderboardBtn" title="查看排行榜 (或按 L 鍵)"></button>
+
+<!-- 排行榜頁面 -->
+<div id="leaderboardPage">
+    <div class="leaderboard-container">
+        <button class="close-leaderboard">×</button>
+        <h2 class="leaderboard-title">🏆 貓貓星球排行榜 🏆</h2>
+        
+        <div class="leaderboard-controls">
+            <div class="leaderboard-tabs">
+                <button class="leaderboard-tab active" data-bit="1">1 BIT</button>
+                <button class="leaderboard-tab" data-bit="2">2 BIT</button>
+                <button class="leaderboard-tab" data-bit="3">3 BIT</button>
+                <button class="leaderboard-tab" data-bit="4">4 BIT</button>
+            </div>
+            
+            <div class="sort-selector">
+                <button class="sort-btn active" data-sort="steps">依步數排序</button>
+                <button class="sort-btn" data-sort="time">依時間排序</button>
+            </div>
+        </div>
+        
+        <div id="leaderboardContent">
+            <!-- 排行榜內容會由JavaScript動態生成 -->
+        </div>
+    </div>
+</div>
+
+<!-- 遊戲主介面 -->
 <div id="gameWrapper">
-  <h2 style="margin:10px 0 5px;">貓貓星球</h2>
+  <h2 style="margin:10px 0 5px; color: var(--earth-coffee);">貓貓星球</h2>
   <div id="container"><svg></svg></div>
   <div id="buttons">
     <button id="prevBtn"></button>
@@ -283,7 +1095,14 @@
     <button id="nextBtn"></button>
   </div>
 </div>
+
+<!-- 底部空白區域，讓頁面可以捲動 -->
+<div class="page-spacer"></div>
+
 <div class="left-panel">
+  <div style="text-align: center; margin-bottom: 10px;">
+    <span id="playerNameDisplay" style="color: var(--earth-coffee); font-weight: bold;">未登入</span>
+  </div>
   <h3>遊戲資訊</h3>
   <div id="info">
     <div id="levelNumber">題目：1</div>
@@ -307,20 +1126,645 @@
     <button id="undoBtn" onclick="undoLastStep()" disabled>回到上一步</button>
   </div>
 </div>
+
 <div class="circuit-panel">
   <h3>電路圖</h3>
   <div id="circuitVisualization" class="circuit-visualization"></div>
 </div>
+
 <div id="successPopup" class="popup">
   <div class="popup-content">
-    <h2>Congratulations 成功！</h2>
-    <p></p><br>
+    <h2>恭喜你成功了！</h2>
+    <p id="successMessage"></p><br>
     <button id="closePopup">再玩一次</button>
   </div>
 </div>
+
 <button class="toggle-circuit-btn" id="toggleCircuitBtn" title="切換隱藏電路模式（或按 H 鍵）"></button>
+
 <script>
-/* ==================== 原始 1/2 bit 圖片與資料 ==================== */
+/* ==================== 配置 ==================== */
+// 請根據您的伺服器設定修改這個URL
+const API_BASE_URL = window.location.origin + '/cat_planet'; // 假設您的專案在 /cat_planet 目錄下
+
+/* ==================== 玩家資料與排行榜系統 ==================== */
+let currentPlayer = {
+    id: 0,
+    name: "訪客",
+    isGuest: true,
+    scores: {
+        1: [], // 1 BIT 關卡紀錄
+        2: [], // 2 BIT 關卡紀錄
+        3: [], // 3 BIT 關卡紀錄
+        4: []  // 4 BIT 關卡紀錄
+    }
+};
+
+// 初始化排行榜資料 (如果本地儲存有資料則載入)
+let leaderboardData = {
+    1: JSON.parse(localStorage.getItem('catPlanetLeaderboard_1')) || [],
+    2: JSON.parse(localStorage.getItem('catPlanetLeaderboard_2')) || [],
+    3: JSON.parse(localStorage.getItem('catPlanetLeaderboard_3')) || [],
+    4: JSON.parse(localStorage.getItem('catPlanetLeaderboard_4')) || []
+};
+
+// 排行榜排序設定
+let currentSort = 'steps'; // 預設依步數排序
+let sortAscending = true;  // 預設升序
+
+/* ==================== 登入系統 ==================== */
+// 表單切換
+document.getElementById('showRegisterBtn').addEventListener('click', function() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    clearMessages();
+});
+
+document.getElementById('showLoginBtn').addEventListener('click', function() {
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    clearMessages();
+});
+
+// 清除訊息
+function clearMessages() {
+    document.getElementById('loginMessage').className = 'form-message';
+    document.getElementById('registerMessage').className = 'form-message';
+}
+
+// 顯示訊息
+function showMessage(elementId, message, type) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.className = `form-message ${type}`;
+    element.style.display = 'block';
+}
+
+// 登入功能
+document.getElementById('loginBtn').addEventListener('click', async function() {
+    const username = document.getElementById('usernameInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    
+    if (!username) {
+        showMessage('loginMessage', '請輸入使用者名稱', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api.php?action=login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            currentPlayer = {
+                id: result.user.id || 0,
+                name: result.user.username,
+                isGuest: result.user.is_guest || false,
+                scores: result.user.scores || {
+                    1: [], 2: [], 3: [], 4: []
+                }
+            };
+            
+            // 更新玩家名稱顯示
+            document.getElementById('playerNameDisplay').textContent = currentPlayer.name;
+            
+            // 顯示登出按鈕
+            document.getElementById('logoutBtn').style.display = 'flex';
+            
+            // 淡出登入頁面
+            document.getElementById('loginPage').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('loginPage').style.display = 'none';
+                // 載入玩家資料
+                loadPlayerData();
+            }, 500);
+            
+        } else {
+            showMessage('loginMessage', result.message || '登入失敗', 'error');
+        }
+    } catch (error) {
+        console.error('登入錯誤:', error);
+        showMessage('loginMessage', '登入失敗，請檢查網路連線', 'error');
+    }
+});
+
+// 訪客登入
+document.getElementById('guestLoginBtn').addEventListener('click', async function() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api.php?action=login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                is_guest: true
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            currentPlayer = {
+                id: 0,
+                name: result.user.username,
+                isGuest: true,
+                scores: {1: [], 2: [], 3: [], 4: []}
+            };
+            
+            // 更新玩家名稱顯示
+            document.getElementById('playerNameDisplay').textContent = currentPlayer.name;
+            
+            // 訪客不顯示登出按鈕，或顯示不同的登出按鈕
+            document.getElementById('logoutBtn').style.display = 'flex';
+            document.getElementById('logoutBtn').title = '返回登入頁面';
+            
+            document.getElementById('loginPage').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loginPage').style.display = 'none';
+            }, 500);
+        }
+    } catch (error) {
+        console.error('訪客登入錯誤:', error);
+        // 後備方案：本地生成訪客名稱
+        currentPlayer.id = 0;
+        currentPlayer.name = "訪客" + Math.floor(Math.random() * 10000);
+        currentPlayer.isGuest = true;
+        
+        // 更新玩家名稱顯示
+        document.getElementById('playerNameDisplay').textContent = currentPlayer.name;
+        
+        // 訪客不顯示登出按鈕，或顯示不同的登出按鈕
+        document.getElementById('logoutBtn').style.display = 'flex';
+        document.getElementById('logoutBtn').title = '返回登入頁面';
+        
+        document.getElementById('loginPage').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('loginPage').style.display = 'none';
+        }, 500);
+    }
+});
+
+// 註冊功能
+document.getElementById('registerBtn').addEventListener('click', async function() {
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+    const email = document.getElementById('regEmail').value.trim();
+    
+    // 驗證輸入
+    if (!username || !password) {
+        showMessage('registerMessage', '請填寫使用者名稱和密碼', 'error');
+        return;
+    }
+    
+    if (username.length > 50) {
+        showMessage('registerMessage', '使用者名稱不能超過50個字元', 'error');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showMessage('registerMessage', '密碼長度至少6個字元', 'error');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showMessage('registerMessage', '兩次輸入的密碼不一致', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api.php?action=register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+                email: email
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showMessage('registerMessage', '註冊成功！請使用新帳號登入', 'success');
+            
+            // 自動填入登入表單
+            setTimeout(() => {
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('usernameInput').value = username;
+                document.getElementById('passwordInput').value = '';
+                clearMessages();
+            }, 2000);
+            
+        } else {
+            showMessage('registerMessage', result.message || '註冊失敗', 'error');
+        }
+    } catch (error) {
+        console.error('註冊錯誤:', error);
+        showMessage('registerMessage', '註冊失敗，請檢查網路連線', 'error');
+    }
+});
+
+/* ==================== 登出系統 ==================== */
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    if (confirm('確定要登出嗎？')) {
+        logoutUser();
+    }
+});
+
+// 登出功能
+function logoutUser() {
+    // 重置玩家資料
+    currentPlayer = {
+        id: 0,
+        name: "訪客",
+        isGuest: true,
+        scores: {
+            1: [], 2: [], 3: [], 4: []
+        }
+    };
+    
+    // 更新玩家名稱顯示
+    document.getElementById('playerNameDisplay').textContent = '未登入';
+    
+    // 隱藏登出按鈕
+    document.getElementById('logoutBtn').style.display = 'none';
+    
+    // 重置遊戲狀態
+    resetCircuit();
+    
+    // 顯示登入頁面
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginPage').style.opacity = '1';
+    
+    // 清空表單
+    document.getElementById('usernameInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    clearMessages();
+    
+    // 切換回登入表單
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+}
+
+// 登出快捷鍵 (O鍵)
+document.addEventListener('keydown', function(e) {
+    if (e.key.toLowerCase() === 'o' && !document.getElementById('loginPage').style.display === 'flex') {
+        logoutUser();
+    }
+});
+
+/* ==================== 排行榜系統 ==================== */
+function showLeaderboard() {
+    document.getElementById('leaderboardPage').style.display = 'flex';
+    updateLeaderboardDisplay(bitCount); // 預設顯示當前 BIT 數的排行榜
+}
+
+function closeLeaderboard() {
+    document.getElementById('leaderboardPage').style.display = 'none';
+}
+
+async function updateLeaderboardDisplay(bit) {
+    const content = document.getElementById('leaderboardContent');
+    content.innerHTML = '<div style="text-align:center; padding:30px; color:var(--earth-dark);">載入中...</div>';
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api.php?action=get_leaderboard&bit=${bit}`);
+        const result = await response.json();
+        
+        if (!result.success) {
+            content.innerHTML = `<div style="text-align:center; padding:30px; color:var(--earth-dark);">${result.message || '載入失敗'}</div>`;
+            return;
+        }
+        
+        const data = result.data || [];
+        
+        // 排序資料
+        const sortedData = sortLeaderboardData(data, currentSort, sortAscending);
+        
+        // 生成表格
+        let html = `<table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th class="leaderboard-rank sortable" data-sort="rank">排名</th>
+                    <th class="leaderboard-name sortable" data-sort="name">玩家</th>
+                    <th class="leaderboard-steps sortable ${currentSort === 'steps' ? (sortAscending ? 'sorted-asc' : 'sorted-desc') : ''}" data-sort="steps">步數</th>
+                    <th class="leaderboard-time sortable ${currentSort === 'time' ? (sortAscending ? 'sorted-asc' : 'sorted-desc') : ''}" data-sort="time">時間(秒)</th>
+                    <th class="sortable" data-sort="level">關卡</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        
+        if (sortedData.length === 0) {
+            html += `<tr><td colspan="5" style="text-align:center; padding:30px;">尚無紀錄，快來成為第一位！</td></tr>`;
+        } else {
+            sortedData.slice(0, 50).forEach((record, index) => { // 顯示50筆
+                const isCurrentPlayer = !currentPlayer.isGuest && record.username === currentPlayer.name;
+                const rowClass = isCurrentPlayer ? 'my-rank' : '';
+                
+                html += `<tr class="${rowClass}">
+                    <td class="leaderboard-rank">${index + 1}</td>
+                    <td class="leaderboard-name">${record.username}</td>
+                    <td class="leaderboard-steps">${record.steps}</td>
+                    <td class="leaderboard-time">${record.time_seconds}</td>
+                    <td>第 ${record.level_number} 關</td>
+                </tr>`;
+            });
+        }
+        
+        html += `</tbody></table>`;
+        content.innerHTML = html;
+        
+        // 添加表格排序事件監聽
+        addTableSortListeners(bit);
+        
+    } catch (error) {
+        console.error('載入排行榜失敗:', error);
+        // 後備方案：使用本地資料
+        const data = leaderboardData[bit] || [];
+        const sortedData = sortLocalLeaderboardData(data, currentSort, sortAscending);
+        
+        let html = `<table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th class="leaderboard-rank sortable" data-sort="rank">排名</th>
+                    <th class="leaderboard-name sortable" data-sort="name">玩家</th>
+                    <th class="leaderboard-steps sortable ${currentSort === 'steps' ? (sortAscending ? 'sorted-asc' : 'sorted-desc') : ''}" data-sort="steps">步數</th>
+                    <th class="leaderboard-time sortable ${currentSort === 'time' ? (sortAscending ? 'sorted-asc' : 'sorted-desc') : ''}" data-sort="time">時間(秒)</th>
+                    <th class="sortable" data-sort="level">關卡</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        
+        if (sortedData.length === 0) {
+            html += `<tr><td colspan="5" style="text-align:center; padding:30px;">尚無紀錄，快來成為第一位！</td></tr>`;
+        } else {
+            sortedData.slice(0, 50).forEach((record, index) => {
+                const isCurrentPlayer = !currentPlayer.isGuest && record.player === currentPlayer.name;
+                const rowClass = isCurrentPlayer ? 'my-rank' : '';
+                
+                html += `<tr class="${rowClass}">
+                    <td class="leaderboard-rank">${index + 1}</td>
+                    <td class="leaderboard-name">${record.player}</td>
+                    <td class="leaderboard-steps">${record.steps}</td>
+                    <td class="leaderboard-time">${record.time}</td>
+                    <td>${record.level}</td>
+                </tr>`;
+            });
+        }
+        
+        html += `</tbody></table>`;
+        content.innerHTML = html;
+        
+        // 添加表格排序事件監聽
+        addTableSortListeners(bit);
+    }
+}
+
+// 排序伺服器資料
+function sortLeaderboardData(data, sortBy, ascending) {
+    const sortedData = [...data];
+    
+    sortedData.sort((a, b) => {
+        let comparison = 0;
+        
+        switch(sortBy) {
+            case 'steps':
+                comparison = a.steps - b.steps;
+                if (comparison === 0) {
+                    comparison = a.time_seconds - b.time_seconds;
+                }
+                break;
+            case 'time':
+                comparison = a.time_seconds - b.time_seconds;
+                if (comparison === 0) {
+                    comparison = a.steps - b.steps;
+                }
+                break;
+            case 'level':
+                comparison = a.level_number - b.level_number;
+                break;
+            case 'name':
+                comparison = a.username.localeCompare(b.username);
+                break;
+            default:
+                comparison = 0;
+        }
+        
+        return ascending ? comparison : -comparison;
+    });
+    
+    return sortedData;
+}
+
+// 排序本地資料
+function sortLocalLeaderboardData(data, sortBy, ascending) {
+    const sortedData = [...data];
+    
+    sortedData.sort((a, b) => {
+        let comparison = 0;
+        
+        switch(sortBy) {
+            case 'steps':
+                comparison = a.steps - b.steps;
+                if (comparison === 0) {
+                    comparison = a.time - b.time;
+                }
+                break;
+            case 'time':
+                comparison = a.time - b.time;
+                if (comparison === 0) {
+                    comparison = a.steps - b.steps;
+                }
+                break;
+            case 'level':
+                comparison = a.level - b.level;
+                break;
+            case 'name':
+                comparison = a.player.localeCompare(b.player);
+                break;
+            default:
+                comparison = 0;
+        }
+        
+        return ascending ? comparison : -comparison;
+    });
+    
+    return sortedData;
+}
+
+// 添加表格排序事件監聽
+function addTableSortListeners(bit) {
+    document.querySelectorAll('.leaderboard-table th.sortable').forEach(th => {
+        th.addEventListener('click', function() {
+            const sortBy = this.dataset.sort;
+            
+            if (sortBy === 'steps' || sortBy === 'time') {
+                if (currentSort === sortBy) {
+                    // 如果點擊相同的排序欄位，切換升序/降序
+                    sortAscending = !sortAscending;
+                } else {
+                    // 如果點擊不同的排序欄位，設為該欄位並預設升序
+                    currentSort = sortBy;
+                    sortAscending = true;
+                }
+                
+                // 更新排序按鈕狀態
+                updateSortButtons();
+                
+                // 重新載入排行榜
+                updateLeaderboardDisplay(bit);
+            }
+        });
+    });
+}
+
+// 更新排序按鈕狀態
+function updateSortButtons() {
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        const sortType = btn.dataset.sort;
+        if (sortType === currentSort) {
+            btn.classList.add('active');
+            btn.textContent = sortAscending ? 
+                `依${sortType === 'steps' ? '步數' : '時間'}排序 ↑` : 
+                `依${sortType === 'steps' ? '步數' : '時間'}排序 ↓`;
+        } else {
+            btn.classList.remove('active');
+            btn.textContent = `依${sortType === 'steps' ? '步數' : '時間'}排序`;
+        }
+    });
+}
+
+// 排序按鈕事件監聽
+document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const sortType = this.dataset.sort;
+        
+        if (currentSort === sortType) {
+            // 如果點擊相同的排序按鈕，切換升序/降序
+            sortAscending = !sortAscending;
+        } else {
+            // 如果點擊不同的排序按鈕，設為該排序方式並預設升序
+            currentSort = sortType;
+            sortAscending = true;
+        }
+        
+        // 更新按鈕狀態
+        updateSortButtons();
+        
+        // 更新排行榜顯示
+        const activeTab = document.querySelector('.leaderboard-tab.active');
+        if (activeTab) {
+            const bit = parseInt(activeTab.dataset.bit);
+            updateLeaderboardDisplay(bit);
+        }
+    });
+});
+
+// 新增分數到排行榜
+async function addScoreToLeaderboard(steps, time, level, bit) {
+    if (currentPlayer.isGuest) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/api.php?action=save_score`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: currentPlayer.id,
+                bit_count: bit,
+                level: level,
+                steps: steps,
+                time: time
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success && result.is_new_record) {
+            console.log('紀錄已儲存到伺服器');
+        }
+    } catch (error) {
+        console.error('儲存分數失敗:', error);
+        // 後備方案：儲存到本地
+        const score = {
+            player: currentPlayer.name,
+            steps: steps,
+            time: time,
+            level: level + 1,
+            date: new Date().toISOString().split('T')[0]
+        };
+        
+        leaderboardData[bit].push(score);
+        localStorage.setItem(`catPlanetLeaderboard_${bit}`, JSON.stringify(leaderboardData[bit]));
+    }
+}
+
+// 載入玩家資料
+function loadPlayerData() {
+    if (currentPlayer.isGuest) return;
+    
+    const savedData = localStorage.getItem(`catPlanetPlayer_${currentPlayer.name}`);
+    if (savedData) {
+        const playerData = JSON.parse(savedData);
+        currentPlayer.scores = playerData.scores || currentPlayer.scores;
+    }
+}
+
+// 儲存玩家資料
+function savePlayerData() {
+    if (currentPlayer.isGuest) return;
+    
+    localStorage.setItem(`catPlanetPlayer_${currentPlayer.name}`, JSON.stringify(currentPlayer));
+}
+
+/* ==================== 排行榜事件監聽 ==================== */
+document.getElementById('leaderboardBtn').addEventListener('click', showLeaderboard);
+
+document.querySelector('.close-leaderboard').addEventListener('click', closeLeaderboard);
+
+document.querySelectorAll('.leaderboard-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        // 移除所有標籤的 active 類
+        document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
+        
+        // 添加當前標籤的 active 類
+        this.classList.add('active');
+        
+        // 更新顯示的排行榜
+        const bit = parseInt(this.dataset.bit);
+        updateLeaderboardDisplay(bit);
+    });
+});
+
+// 鍵盤快捷鍵
+document.addEventListener('keydown', function(e) {
+    if (e.key.toLowerCase() === 'l') {
+        showLeaderboard();
+    }
+});
+
+// 點擊排行榜外部關閉
+document.getElementById('leaderboardPage').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeLeaderboard();
+    }
+});
+
+/* ==================== 原始遊戲程式碼 (保持不變) ==================== */
 const raw = "https://raw.githubusercontent.com/s112321005/little_prince/main/";
 const planetImg = {
   "3flower": raw+"3flower_00.png",
@@ -335,7 +1779,6 @@ const fishImg = {
   "dollFish":    raw+"dollFish%20.png"
 };
  
-/* ==================== 3 bit 圖片與資料 ==================== */
 const raw3 = "https://raw.githubusercontent.com/s112321005/little_prince/main/3bit/";
 const baseNames = ["3flower", "Bob", "Kurover", "Siam", "Black", "Bins", "Sakaban", "White"];
 const planetImg3 = {
@@ -359,10 +1802,8 @@ const fishImg3 = {
   "WhiteFish":   raw3+"WhiteFish.png"
 };
 
-/* ==================== 4 bit 圖片與資料 ==================== */
-const raw4 = "https://s112321005.github.io/little_prince/4bit%20cat/";
+const raw4 = "https://s112321005.github.io/little_prince/4bit/";
 
-/* ==================== 原始 24 個 2bit 排列 ==================== */
 const permList = [
   "0132","0213","0231","0312","0321",
   "1023","1032","1203","1230","1302","1320",
@@ -370,7 +1811,6 @@ const permList = [
   "3012","3021","3102","3120","3201","3210"
 ].map(s => s.split("").map(Number));
  
-/* ==================== 3bit / 4bit 隨機排列 ==================== */
 function genPerm(n) {
   let a = Array.from({length: n}, (_, i) => i);
   for (let i=n-1; i>0; i--) {
@@ -382,97 +1822,81 @@ function genPerm(n) {
 const permList3bit = Array.from({length: 30}, () => genPerm(8));
 permList3bit.push([7, 6, 5, 4, 3, 2, 1, 0]);
 
-// 4bit 排列：特別設計
 const permList4bit = [];
-// 第 1 關：強制完全交換 (Cross Swap) - 左邊星球全是右邊的魚，右邊星球全是左邊的魚
-permList4bit.push(Array.from({length: 16}, (_, i) => (i + 8) % 16)); 
-// 第 2 關：隨機
+permList4bit.push(Array.from({length: 16}, (_, i) => (i + 8) % 16));
 permList4bit.push(genPerm(16));
-// 第 3 關：完全反轉
-permList4bit.push(Array.from({length: 16}, (_, i) => 15-i)); 
-// 後續隨機補滿
+permList4bit.push(Array.from({length: 16}, (_, i) => 15-i));
 for(let k=0; k<10; k++) permList4bit.push(genPerm(16));
 
-
-/* ==================== 關卡資料 ==================== */
 let bitCount = 2;
 
 function generate4BitLevelData() {
-    // 雖然 4bit 使用新的圖片，但座標仍借用 basePos 的結構
     const basePos = [
-        {top:140, left:140}, // 000
-        {top:140, left:340}, // 001
-        {top:340, left:140}, // 010
-        {top:340, left:340}, // 011
-        {top:20,  left:20},  // 100
-        {top:20,  left:460}, // 101
-        {top:460, left:20},  // 110
-        {top:460, left:460}  // 111
+        {top:140, left:140},
+        {top:140, left:340},
+        {top:340, left:140},
+        {top:340, left:340},
+        {top:20,  left:20},
+        {top:20,  left:460},
+        {top:460, left:20},
+        {top:460, left:460}
     ];
 
     const planets = [];
-    const scale = 1.7; 
-
-    // Cube 1 (左邊)
-    const offX1 = 0; 
-    const offY1 = 180; 
-
-    // Cube 2 (右邊)
-    const offX2 = 500; 
-    const offY2 = 20; 
+    const scale = 1.7;
+    const offX1 = 0;
+    const offY1 = 180;
+    const offX2 = 500;
+    const offY2 = 20;
 
     for(let i=0; i<8; i++) {
-        // 生成 key 0000 ~ 0111
         let keyStr = i.toString(2).padStart(4, "0");
         planets.push({
             id: `planet${i}`,
-            key: keyStr, 
+            key: keyStr,
             label: keyStr,
-            top: basePos[i].top/scale + offY1, 
+            top: basePos[i].top/scale + offY1,
             left: basePos[i].left/scale + offX1,
             isFaded: false
         });
     }
     for(let i=0; i<8; i++) {
-        // 生成 key 1000 ~ 1111
         let keyStr = (i+8).toString(2).padStart(4, "0");
         planets.push({
             id: `planet${i+8}`,
-            key: keyStr, 
+            key: keyStr,
             label: keyStr,
             top: basePos[i].top/scale + offY2,
             left: basePos[i].left/scale + offX2,
-            isFaded: true 
+            isFaded: true
         });
     }
 
     const lines = [];
     const baseConnections = [
-        [0,1],[0,2],[1,3],[2,3], 
-        [4,5],[4,6],[5,7],[6,7], 
+        [0,1],[0,2],[1,3],[2,3],
+        [4,5],[4,6],[5,7],[6,7],
         [0,4],[1,5],[2,6],[3,7]  
     ];
     baseConnections.forEach(([a,b]) => {
-        lines.push([`l${a}_${b}`, `planet${a}`, `planet${b}`]); 
-        lines.push([`l${a+8}_${b+8}`, `planet${a+8}`, `planet${b+8}`]); 
+        lines.push([`l${a}_${b}`, `planet${a}`, `planet${b}`]);
+        lines.push([`l${a+8}_${b+8}`, `planet${a+8}`, `planet${b+8}`]);
     });
 
     for(let i=0; i<8; i++) {
-        lines.push([`hyper${i}`, `planet${i}`, `planet${i+8}`, true]); 
+        lines.push([`hyper${i}`, `planet${i}`, `planet${i+8}`, true]);
     }
 
     return (permIndex) => {
         const perm = permList4bit[permIndex] || permList4bit[0];
         const princes = [];
-        
+       
         for(let i=0; i<16; i++) {
-            // 4bit 魚的圖片直接使用二進位編碼名稱
             const fishKeyStr = i.toString(2).padStart(4, "0");
             princes.push({
                 img: raw4 + fishKeyStr + "Fish.png",
-                target: `planet${i}`, 
-                // 這裡標記 target >= 8 的魚就是"虛擬魚"，遊戲勝利判定時會用到
-                isFadedFish: i >= 8 
+                target: `planet${i}`,
+                isFadedFish: i >= 8
             });
         }
         return { planets, lines, princes };
@@ -482,7 +1906,7 @@ function generate4BitLevelData() {
 const get4BitLevel = generate4BitLevelData();
 
 const bitLevels = {
-  1: [{ 
+  1: [{
     planets: [{id:"planet1", key:"3flower", top:140, left:20}, {id:"planet2", key:"Bob", top:140, left:260}],
     princes: [{img: fishImg["3flowerFish"], target:"planet1"}, {img: fishImg["BobFish"], target:"planet2"}],
     lines:[["line12","planet1","planet2"]]
@@ -532,7 +1956,6 @@ const bitLevels = {
   4: permList4bit.map((_, idx) => get4BitLevel(idx))
 };
  
- 
 /* ==================== 核心變數 ==================== */
 let currentLevel = 0, steps = 0, startTime, timerInterval;
 let circuit = [], currentMap = [];
@@ -543,13 +1966,21 @@ const timerDisplay = document.getElementById("timer");
 const container = document.getElementById("container");
 const svg = container.querySelector("svg");
 const undoBtn = document.getElementById("undoBtn");
- 
+
 /* ==================== 工具函數 ==================== */
-function stateIndexToBits(i) { return i.toString(2).padStart(bitCount,"0").split("").map(Number); }
-function bitsToStateIndex(bits) { return parseInt(bits.join(""),2); }
+function stateIndexToBits(i) { 
+    if (bitCount === 2) {
+        return i.toString(2).padStart(bitCount,"0").split("").map(Number); 
+    }
+    return i.toString(2).padStart(bitCount,"0").split("").map(Number); 
+}
+
+function bitsToStateIndex(bits) { 
+    return parseInt(bits.join(""),2); 
+}
 
 function applyGateToIndex(stateIndex, gate){
-  const b = stateIndexToBits(stateIndex); 
+  const b = stateIndexToBits(stateIndex);
   const nb = b.slice();
   const getBitIndex = (t) => t;
 
@@ -572,7 +2003,7 @@ function applyGateToIndex(stateIndex, gate){
         nb[getBitIndex(gate.target)] ^= 1;
       }
       break;
-    case "MCNOT": 
+    case "MCNOT":
       let trigger = true;
       for(let c of gate.controls) {
           const currentBitVal = nb[getBitIndex(c.bit)];
@@ -592,43 +2023,35 @@ function applyGateToIndex(stateIndex, gate){
 function renderGateButtons(){
   const box = document.querySelector(".gate-btns");
   box.innerHTML = "";
-  
+
   let gates = [];
 
   if (bitCount === 4) {
-      // 4 Bit 
       [0,1,2,3].forEach(i => {
           gates.push({text:`X q${i}`, g:{type:"X", target:i}});
       });
       gates.push({text:"CNOT q0→q1", g:{type:"CNOT", control:0, target:1}});
       gates.push({text:"CNOT q3→q2", g:{type:"CNOT", control:3, target:2}});
   } else if (bitCount === 3) {
-      // 完整的 3-bit 閘門設定
-      // 3個 單量子比特 X
       gates.push({text:"X q0", g:{type:"X",target:0}});
       gates.push({text:"X q1", g:{type:"X",target:1}});
       gates.push({text:"X q2", g:{type:"X",target:2}});
 
-      // 12 個 Toffoli Gates (依目標位元分組)
-      // Target: q2 (Controls: q0, q1)
       gates.push({text:"TOF(q0,q1,   q2)", g:{type:"CCNOT", control1:0, c1Val:1, control2:1, c2Val:1, target:2}});
       gates.push({text:"TOF(q0',q1', q2)", g:{type:"CCNOT", control1:0, c1Val:0, control2:1, c2Val:0, target:2}});
       gates.push({text:"TOF(q0',q1,  q2)", g:{type:"CCNOT", control1:0, c1Val:0, control2:1, c2Val:1, target:2}});
       gates.push({text:"TOF(q0,q1',  q2)", g:{type:"CCNOT", control1:0, c1Val:1, control2:1, c2Val:0, target:2}});
 
-      // Target: q1 (Controls: q0, q2)
       gates.push({text:"TOF(q0,q2,   q1)", g:{type:"CCNOT", control1:0, c1Val:1, control2:2, c2Val:1, target:1}});
       gates.push({text:"TOF(q0',q2', q1)", g:{type:"CCNOT", control1:0, c1Val:0, control2:2, c2Val:0, target:1}});
       gates.push({text:"TOF(q0',q2,  q1)", g:{type:"CCNOT", control1:0, c1Val:0, control2:2, c2Val:1, target:1}});
       gates.push({text:"TOF(q0,q2',  q1)", g:{type:"CCNOT", control1:0, c1Val:1, control2:2, c2Val:0, target:1}});
 
-      // Target: q0 (Controls: q1, q2)
       gates.push({text:"TOF(q1,q2,   q0)", g:{type:"CCNOT", control1:1, c1Val:1, control2:2, c2Val:1, target:0}});
       gates.push({text:"TOF(q1',q2', q0)", g:{type:"CCNOT", control1:1, c1Val:0, control2:2, c2Val:0, target:0}});
       gates.push({text:"TOF(q1',q2,  q0)", g:{type:"CCNOT", control1:1, c1Val:0, control2:2, c2Val:1, target:0}});
       gates.push({text:"TOF(q1,q2',  q0)", g:{type:"CCNOT", control1:1, c1Val:1, control2:2, c2Val:0, target:0}});
 
-      // 6 個普通 CNOT (1-Control)
       gates.push({text:"CNOT q0→q1", g:{type:"CNOT",control:0,target:1}});
       gates.push({text:"CNOT q1→q0", g:{type:"CNOT",control:1,target:0}});
       gates.push({text:"CNOT q0→q2", g:{type:"CNOT",control:0,target:2}});
@@ -636,19 +2059,21 @@ function renderGateButtons(){
       gates.push({text:"CNOT q1→q2", g:{type:"CNOT",control:1,target:2}});
       gates.push({text:"CNOT q2→q1", g:{type:"CNOT",control:2,target:1}});
 
-      // 6 個 0-Control CNOT
       gates.push({text:"0CNOT q0→q1", g:{type:"0CNOT",control:0,target:1}});
       gates.push({text:"0CNOT q1→q0", g:{type:"0CNOT",control:1,target:0}});
       gates.push({text:"0CNOT q0→q2", g:{type:"0CNOT",control:0,target:2}});
       gates.push({text:"0CNOT q2→q0", g:{type:"0CNOT",control:2,target:0}});
       gates.push({text:"0CNOT q1→q2", g:{type:"0CNOT",control:1,target:2}});
       gates.push({text:"0CNOT q2→q1", g:{type:"0CNOT",control:2,target:1}});
-  } else {
-      // 1-bit 和 2-bit 閘門
+  } else if (bitCount === 2) {
       gates.push({text:"X q0", g:{type:"X",target:0}});
-      if(bitCount>1) gates.push({text:"X q1", g:{type:"X",target:1}});
-      if(bitCount>1) gates.push({text:"1CNOT q0→q1", g:{type:"CNOT",control:0,target:1}});
-      if(bitCount>1) gates.push({text:"0CNOT q0→q1", g:{type:"0CNOT",control:0,target:1}});
+      gates.push({text:"X q1", g:{type:"X",target:1}});
+      gates.push({text:"1CNOT q0→q1", g:{type:"CNOT",control:0,target:1}});
+      gates.push({text:"0CNOT q0→q1", g:{type:"0CNOT",control:0,target:1}});
+      gates.push({text:"1CNOT q1→q0", g:{type:"CNOT",control:1,target:0}});
+      gates.push({text:"0CNOT q1→q0", g:{type:"0CNOT",control:1,target:0}});
+  } else {
+      gates.push({text:"X q0", g:{type:"X",target:0}});
   }
 
   gates.forEach(o=>{
@@ -692,11 +2117,9 @@ function renderGateList(){
   });
 }
 function saveStateToHistory() {
-  // 保存魚的 HTML 結構 (包含 class) 比較保險，或者保存 src 和 opacity 狀態
-  // 這裡我們重新抓取魚的資料
   const fishData = {};
-  Object.keys(planets).forEach(id=>{ 
-      const f = planets[id].querySelector(".person"); 
+  Object.keys(planets).forEach(id=>{
+      const f = planets[id].querySelector(".person");
       if(f) {
           fishData[id] = { src: f.src, isGhost: f.classList.contains("ghost-fish") };
       }
@@ -707,25 +2130,24 @@ function saveStateToHistory() {
   if(history.length > 50) history.shift();
   updateUndoButton();
 }
-// 恢復歷史紀錄
+
 function restoreFishPositions(fishData){
   Object.values(planets).forEach(p=>p.querySelectorAll(".person").forEach(img=>img.remove()));
   Object.entries(fishData).forEach(([id, data])=>{
     if(planets[id]){
       const img = document.createElement("img");
-      img.src = data.src; 
+      img.src = data.src;
       img.className = "person";
       if(data.isGhost) img.classList.add("ghost-fish");
-      
-      // 復原 CSS 樣式
+     
       if(data.isGhost) {
-         img.style.opacity = "1"; // 修改：改回 1
+         img.style.opacity = "1";
          img.style.filter = "grayscale(40%) sepia(20%)";
       } else {
          img.style.opacity = "1";
          img.style.filter = "none";
       }
-      
+     
       planets[id].appendChild(img);
     }
   });
@@ -771,18 +2193,18 @@ function addCNOTGate(c, t, p, hollow) {
     const container = document.getElementById("circuitVisualization");
     const conn = document.createElement("div");
     conn.className = "circuit-connector";
-    conn.style.left = (46 + p) + "px"; 
+    conn.style.left = (46 + p) + "px";
     conn.style.top = (topPos+5) + "px";
     conn.style.height = (height-10) + "px";
     conn.style.transform = "none";
     container.appendChild(conn);
-    
+   
     const cl = document.getElementById(`circuit-line-${c}`);
     const cd = document.createElement("div");
     cd.className = hollow ? "circuit-control hollow" : "circuit-control";
     cd.style.left = p + "px";
     cl.appendChild(cd);
-    
+   
     const tl = document.getElementById(`circuit-line-${t}`);
     const td = document.createElement("div");
     td.className = "circuit-target";
@@ -797,7 +2219,7 @@ function addCCNOTGate(g, p) {
     const max = lines[lines.length-1];
     const topPos = (min * ROW_H) + 12.5;
     const height = (max - min) * ROW_H;
-    
+   
     const container = document.getElementById("circuitVisualization");
     const conn = document.createElement("div");
     conn.className = "circuit-connector";
@@ -806,19 +2228,19 @@ function addCCNOTGate(g, p) {
     conn.style.height = (height-10) + "px";
     conn.style.transform = "none";
     container.appendChild(conn);
-    
+   
     const c1l = document.getElementById(`circuit-line-${g.control1}`);
     const c1d = document.createElement("div");
     c1d.className = g.c1Val === 0 ? "circuit-control hollow" : "circuit-control";
     c1d.style.left = p + "px";
     c1l.appendChild(c1d);
-    
+   
     const c2l = document.getElementById(`circuit-line-${g.control2}`);
     const c2d = document.createElement("div");
     c2d.className = g.c2Val === 0 ? "circuit-control hollow" : "circuit-control";
     c2d.style.left = p + "px";
     c2l.appendChild(c2d);
-    
+   
     const tl = document.getElementById(`circuit-line-${g.target}`);
     const td = document.createElement("div");
     td.className = "circuit-target";
@@ -831,10 +2253,10 @@ function addMCNOTGate(g, p) {
     const involved = g.controls.map(c => c.bit).concat([g.target]).sort((a,b)=>a-b);
     const min = involved[0];
     const max = involved[involved.length-1];
-    
+   
     const topPos = (min * ROW_H) + 12.5;
     const height = (max - min) * ROW_H;
-    
+   
     const container = document.getElementById("circuitVisualization");
     const conn = document.createElement("div");
     conn.className = "circuit-connector";
@@ -865,36 +2287,37 @@ function applyGateAndAnimate(gate){
   const size = 1 << bitCount;
   currentMap = Array.from({length:size}, (_,i)=>applyGateToIndex(i, gate));
   const perm = Array.from({length:size}, (_,i)=>applyGateToIndex(i, gate));
-  
+ 
   perm.forEach((to,from)=>{
-    if(to === from) return; 
+    if(to === from) return;
 
-    let idPrefix = "planet";
     let pidFrom, pidTo;
-    
-    if (bitCount <= 2) {
-        pidFrom = idPrefix + (from + 1);
-        pidTo = idPrefix + (to + 1);
+   
+    if (bitCount === 1) {
+      pidFrom = "planet" + (from + 1);
+      pidTo = "planet" + (to + 1);
+    } else if (bitCount === 2) {
+      pidFrom = "planet" + (from + 1);
+      pidTo = "planet" + (to + 1);
     } else {
-        pidFrom = idPrefix + from;
-        pidTo = idPrefix + to;
+      pidFrom = "planet" + from;
+      pidTo = "planet" + to;
     }
 
-    const fish = planets[pidFrom]?.querySelector(".person"); 
+    const fish = planets[pidFrom]?.querySelector(".person");
     if(!fish) return;
-    
+   
     const r1 = planets[pidFrom].getBoundingClientRect();
     const r2 = planets[pidTo].getBoundingClientRect();
     const dx = r2.left - r1.left, dy = r2.top - r1.top;
-    
+   
     fish.style.transform = `translate(${dx}px,${dy}px) translate(-50%,-50%)`;
-    setTimeout(()=>{ 
+    setTimeout(()=>{
         if(planets[pidTo]) {
-            planets[pidTo].appendChild(fish); 
-            fish.style.transform="translate(-50%,-50%)"; 
-            // 移除原本移動時變淡的邏輯，保持魚原本的身份樣式 (Ghost 永遠是 Ghost)
+            planets[pidTo].appendChild(fish);
+            fish.style.transform="translate(-50%,-50%)";
         }
-        checkSuccess(); 
+        checkSuccess();
     }, 800);
   });
   steps++; stepDisplay.textContent = `步數：${steps}`;
@@ -908,13 +2331,13 @@ function loadLevel(idx){
   container.querySelectorAll(".planet").forEach(p=>p.remove());
   svg.innerHTML=""; planets = {};
   const level = getCurrentLevel();
-  
+ 
   let planetSize = 140;
   if (bitCount===3) planetSize = 90;
-  if (bitCount===4) planetSize = 70; 
+  if (bitCount===4) planetSize = 70;
 
   if (bitCount===4) {
-      container.style.width = "900px"; 
+      container.style.width = "900px";
       container.style.height = "550px";
   } else if (bitCount===3) {
       container.style.width = "600px";
@@ -926,18 +2349,20 @@ function loadLevel(idx){
 
   level.planets.forEach(p=>{
     const div = document.createElement("div");
-    div.className = "planet"; 
-    if(p.isFaded) div.classList.add("faded"); 
+    div.className = "planet";
+    if(p.isFaded) div.classList.add("faded");
     div.id = p.id;
     div.style.top = p.top+"px"; div.style.left = p.left+"px";
     div.style.width = div.style.height = planetSize+"px";
     if(p.label) div.setAttribute("data-label", p.label);
-    
+   
     const img = document.createElement("img");
     if(bitCount===4) {
          img.src = raw4 + p.key + ".png";
     } else if (bitCount===3) {
          img.src = planetImg3[p.key];
+    } else if (bitCount === 2) {
+         img.src = planetImg[p.key];
     } else {
          img.src = planetImg[p.key];
     }
@@ -945,7 +2370,7 @@ function loadLevel(idx){
     container.appendChild(div);
     planets[p.id] = div;
   });
-  
+ 
   const offset = planetSize / 2;
   level.lines.forEach(([id,p1,p2,isHyper])=>{
     const line = document.createElementNS("http://www.w3.org/2000/svg","line");
@@ -953,18 +2378,18 @@ function loadLevel(idx){
     const pl2 = level.planets.find(x=>x.id===p2);
     line.setAttribute("x1",pl1.left+offset); line.setAttribute("y1",pl1.top+offset);
     line.setAttribute("x2",pl2.left+offset); line.setAttribute("y2",pl2.top+offset);
-    line.style.stroke = "#555"; 
+    line.style.stroke = "#555";
     line.style.strokeWidth = "4";
-    if(isHyper) line.classList.add("hyper-line"); 
+    if(isHyper) line.classList.add("hyper-line");
 
     svg.appendChild(line);
-    
+   
     line.addEventListener("mouseenter",()=>{
-        line.style.stroke="#ffcc00"; 
+        line.style.stroke="#ffcc00";
         line.style.strokeWidth="8";
     });
     line.addEventListener("mouseleave",()=>{
-        line.style.stroke = isHyper ? "#999" : "#555"; 
+        line.style.stroke = isHyper ? "#999" : "#555";
         line.style.strokeWidth = isHyper ? "3" : "4";
     });
     line.addEventListener("click",()=>onLineClick(p1,p2));
@@ -978,10 +2403,9 @@ function loadLevel(idx){
 
 function placePrincesByFixedArrangement(idx){
   Object.values(planets).forEach(p => p.querySelectorAll(".person").forEach(img => img.remove()));
-  
+ 
   if(bitCount===4){
      const perm = permList4bit[idx] || permList4bit[0];
-     // const fishKeys = ["3flowerFish","BobFish","KuroverFish","SiamFish","BlackFish","BinsFish","SakabanFish","WhiteFish"];
      
      perm.forEach((fishIdx, pos)=>{
          const img = document.createElement("img");
@@ -991,14 +2415,11 @@ function placePrincesByFixedArrangement(idx){
          
          img.className = "person";
          
-         // 關鍵修改：不看位置 (pos)，只看魚的身分 (fishIdx)
-         // 如果這條魚的目標是 8-15 (右邊正方體)，它就是虛擬魚，永遠保持淡化
          if(fishIdx >= 8) {
              img.classList.add("ghost-fish");
-             img.style.opacity = "1"; // 修改：改回 1 (原本是 0.55)
+             img.style.opacity = "1";
              img.style.filter = "grayscale(40%) sepia(20%)";
          } else {
-             // 實體魚，保持原樣
              img.style.opacity = "1";
              img.style.filter = "none";
          }
@@ -1025,10 +2446,11 @@ function placePrincesByFixedArrangement(idx){
         img.className = "person";
         planets[ids[i]].appendChild(img);
     });
-  } else {
+  } else if(bitCount===2){
     const perm = permList[idx];
     const fishOrder = [fishImg["3flowerFish"], fishImg["BobFish"], fishImg["KuroFish"], fishImg["dollFish"]];
     const ids = ["planet1","planet2","planet3","planet4"];
+    
     perm.forEach((fishIdx,pos)=>{
       const img = document.createElement("img");
       img.src = fishOrder[fishIdx];
@@ -1044,7 +2466,18 @@ function checkSuccess(){
     if(!img) return false;
     return img.src === p.img || decodeURIComponent(img.src) === decodeURIComponent(p.img);
   });
-  if(ok){ clearInterval(timerInterval); showPopup(steps, Math.floor((Date.now()-startTime)/1000)); }
+  
+  if(ok){ 
+      clearInterval(timerInterval); 
+      const time = Math.floor((Date.now()-startTime)/1000);
+      
+      document.getElementById("successMessage").innerHTML = 
+          `哇！<span style="color: var(--earth-coffee); font-weight: bold;">${currentPlayer.name}</span>，你走了 <span style="color: var(--earth-coffee); font-weight: bold;">${steps}</span> 步，花了 <span style="color: var(--earth-coffee); font-weight: bold;">${time}</span> 秒，讓每隻貓都吃到對應的魚耶~`;
+      
+      addScoreToLeaderboard(steps, time, currentLevel, bitCount);
+      
+      showPopup(steps, time); 
+  }
 }
 
 function startTimer(){
@@ -1052,12 +2485,11 @@ function startTimer(){
   startTime = Date.now();
   timerInterval = setInterval(()=>{ timerDisplay.textContent = `時間：${Math.floor((Date.now()-startTime)/1000)} 秒`; },1000);
 }
-function showPopup(s,t){ document.querySelector("#successPopup p").innerHTML = `哇！你走了 ${s} 步，花了 ${t} 秒，讓每隻貓都吃到對應的魚耶~`; document.getElementById("successPopup").style.display = "flex"; }
+function showPopup(s,t){ document.getElementById("successPopup").style.display = "flex"; }
 function softResetFish(){ steps=0; stepDisplay.textContent="步數：0"; placePrincesByFixedArrangement(currentLevel); startTimer(); history=[]; updateUndoButton(); }
 
 function onLineClick(p1Str, p2Str) {
-  const p1 = parseInt(p1Str.replace("planet",""));
-  const p2 = parseInt(p2Str.replace("planet",""));
+  let p1, p2;
   
   if (bitCount === 1) {
     applyGateAndAnimate({ type: "X", target: 0 });
@@ -1065,33 +2497,28 @@ function onLineClick(p1Str, p2Str) {
   }
   
   if (bitCount === 2) {
-      const map2 = {
-        "0,1": { type: "0CNOT", control: 0, target: 1 }, 
-        "0,2": { type: "0CNOT", control: 1, target: 0 }, 
-        "1,3": { type: "CNOT",  control: 0, target: 1 }, 
-        "2,3": { type: "CNOT",  control: 1, target: 0 }  
-      };
-      
-      const gate = generateGateFromTransition(p1, p2, bitCount);
-      if(gate) applyGateAndAnimate(gate);
-      return;
+    p1 = parseInt(p1Str.replace("planet", "")) - 1;
+    p2 = parseInt(p2Str.replace("planet", "")) - 1;
+    
+    const gate = generateGateFromTransition(p1, p2, bitCount);
+    if(gate) {
+        applyGateAndAnimate(gate);
+    }
+    return;
   }
-
-  if (bitCount === 3) {
-      const gate = generateGateFromTransition(p1, p2, bitCount);
-      if(gate) applyGateAndAnimate(gate);
-      return;
-  }
-
-  if (bitCount === 4) {
-      const gate = generateGateFromTransition(p1, p2, 4);
-      if(gate) applyGateAndAnimate(gate);
-      return;
+  
+  if (bitCount === 3 || bitCount === 4) {
+    p1 = parseInt(p1Str.replace("planet", ""));
+    p2 = parseInt(p2Str.replace("planet", ""));
+    
+    const gate = generateGateFromTransition(p1, p2, bitCount);
+    if(gate) applyGateAndAnimate(gate);
+    return;
   }
 }
 
 function generateGateFromTransition(s1, s2, bits) {
-    const b1 = stateIndexToBits(s1); 
+    const b1 = stateIndexToBits(s1);
     const b2 = stateIndexToBits(s2);
 
     let target = -1;
@@ -1099,7 +2526,7 @@ function generateGateFromTransition(s1, s2, bits) {
 
     for(let i=0; i<bits; i++){
         if(b1[i] !== b2[i]) {
-            if(target !== -1) return null; 
+            if(target !== -1) return null;
             target = i;
         } else {
             controls.push({bit: i, val: b1[i]});
@@ -1110,10 +2537,10 @@ function generateGateFromTransition(s1, s2, bits) {
 
     if (controls.length === 1) {
         const c = controls[0];
-        return { 
-            type: c.val === 1 ? "CNOT" : "0CNOT", 
-            control: c.bit, 
-            target: target 
+        return {
+            type: c.val === 1 ? "CNOT" : "0CNOT",
+            control: c.bit,
+            target: target
         };
     } else if (controls.length === 2) {
         return {
@@ -1131,9 +2558,14 @@ function generateGateFromTransition(s1, s2, bits) {
     }
 }
 
+// 成功彈窗關閉按鈕
+document.getElementById("closePopup").onclick = ()=>{ 
+    document.getElementById("successPopup").style.display="none"; 
+    resetCircuit(); 
+};
 
-document.getElementById("closePopup").onclick = ()=>{ document.getElementById("successPopup").style.display="none"; resetCircuit(); };
 document.getElementById("resetBtn").onclick = ()=>{ resetCircuit(); };
+
 document.getElementById("bitSelector").onchange = (e)=>{
   bitCount = parseInt(e.target.value);
   currentLevel = 0;
@@ -1141,7 +2573,10 @@ document.getElementById("bitSelector").onchange = (e)=>{
   renderGateButtons();
   loadLevel(currentLevel);
   resetCircuit();
+  
+  updateLeaderboardDisplay(bitCount);
 };
+
 let animating=false;
 function transitionLevel(next,dir){
   if(animating) return; animating=true;
@@ -1154,8 +2589,19 @@ function transitionLevel(next,dir){
     setTimeout(()=>{ container.classList.remove("slide-in-right","slide-in-left"); animating=false; },620);
   },320);
 }
-document.getElementById("prevBtn").onclick = ()=>{ const L=bitLevels[bitCount].length; transitionLevel((currentLevel-1+L)%L,"left"); resetCircuit(); };
-document.getElementById("nextBtn").onclick = ()=>{ const L=bitLevels[bitCount].length; transitionLevel((currentLevel+1)%L,"right"); resetCircuit(); };
+
+document.getElementById("prevBtn").onclick = ()=>{ 
+    const L=bitLevels[bitCount].length; 
+    transitionLevel((currentLevel-1+L)%L,"left"); 
+    resetCircuit(); 
+};
+
+document.getElementById("nextBtn").onclick = ()=>{ 
+    const L=bitLevels[bitCount].length; 
+    transitionLevel((currentLevel+1)%L,"right"); 
+    resetCircuit(); 
+};
+
 const toggleBtn = document.getElementById('toggleCircuitBtn');
 let hidden = false;
 toggleBtn.addEventListener('click', ()=>{ hidden=!hidden; document.body.classList.toggle('hide-circuit-mode',hidden); });
@@ -1163,7 +2609,7 @@ document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='h') toggleBt
 
 renderGateButtons();
 loadLevel(currentLevel);
-
 </script>
 </body>
 </html>
+
